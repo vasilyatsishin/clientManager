@@ -34,19 +34,32 @@ const Confirmation: FC = () => {
       await AsyncStorage.setItem("sectors", JSON.stringify(sector));
       dispatch(changeSectors(sector));
       await AsyncStorage.setItem("theme", sector[0]);
-      dispatch(changeTheme(sector[0]))
+      dispatch(changeTheme(sector[0]));
     } catch (error) {
       console.log(error);
     }
   };
   const confirm = async () => {
-    const response: UserInterface = await confirmationByTg(otp, selector.bosId);
-    if (response) {
-      setUser(response);
-      dispatch(setUserInfo(response));
-      choosingSector(response.sector)
-    } else {
-      console.log(1);
+    if (otp.length !== maxLength) {
+      setIsFilled(false);
+      return;
+    }
+    setIsFilled(true);
+
+    try {
+      const response: UserInterface = await confirmationByTg(
+        otp,
+        selector.bosId
+      );
+      if (response) {
+        setUser(response);
+        dispatch(setUserInfo(response));
+        choosingSector(response.sector);
+      } else {
+        console.log("Невірний код");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -99,10 +112,12 @@ const Confirmation: FC = () => {
         ))}
       </View>
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          confirm();
-        }}
+        style={[
+          styles.button,
+          otp.length !== maxLength && styles.buttonDisabled,
+        ]}
+        onPress={confirm}
+        disabled={isFilled} // Заборонити натискати кнопку, якщо код не введено повністю
       >
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
@@ -154,6 +169,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "lightgrey",
     margin: "auto",
+  },
+  buttonDisabled: {
+    backgroundColor: "grey", // Кнопка стає сірою, якщо не всі цифри введені
   },
 });
 
