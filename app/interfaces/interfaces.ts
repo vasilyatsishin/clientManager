@@ -1,6 +1,6 @@
 export interface UserInterface {
-  name: string,
-  sector: string[]
+  name: string;
+  sector: string[];
 }
 
 export interface IContext {
@@ -8,7 +8,7 @@ export interface IContext {
   isLoading: boolean;
   login: (bosId: number) => object;
   logout: () => object;
-  setUser: (user:UserInfoResponse) => void;
+  setUser: (user: UserInfoResponse) => void;
 }
 
 export interface RefreshTokenResponse {
@@ -23,5 +23,18 @@ export interface LoginResponse {
 
 export interface UserInfoResponse {
   name: string;
-  sector: string[]
+  sector: string[];
+}
+
+export interface generalState {
+  theme: string;
+  safeViewColor: string;
+  sectors: string[];
+  activePage: string;
+}
+
+export interface authState {
+  exist: boolean;
+  bosId: number;
+  user: UserInfoResponse;
 }

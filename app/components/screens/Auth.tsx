@@ -48,11 +48,15 @@ const Auth: FC = () => {
           </TouchableOpacity>
           {showTooltip && (
             <View style={styles.tooltip}>
-              <Text style={styles.tooltipText}>BOS-id можна знайти у вашому профілі</Text>
+              <Text style={styles.tooltipText}>
+                BOS-id можна знайти у вашому профілі
+              </Text>
             </View>
           )}
         </View>
-        {!isFilled && <Text style={styles.errorText}>BOS-id не може бути порожнім</Text>}
+        {!isFilled && (
+          <Text style={styles.errorText}>BOS-id не може бути порожнім</Text>
+        )}
       </View>
       <TouchableOpacity style={styles.buttonAuth} onPress={handleLogin}>
         <Text style={styles.textInButton}>Log In</Text>
@@ -81,12 +85,12 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: 230,
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   inputWrapper: {
     height: 60,
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: "center",
   },
   input: {
     borderColor: "lightgrey",
@@ -116,13 +120,13 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginTop: 60,
-    position: "absolute"
+    position: "absolute",
   },
   icon: {
     width: 22,
     height: 22,
     marginTop: 10,
-    marginLeft: 13
+    marginLeft: 13,
   },
   tooltip: {
     position: "absolute",

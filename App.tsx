@@ -7,11 +7,11 @@ import { NavigationContainer } from "@react-navigation/native";
 export default function App() {
   return (
     <NavigationContainer>
-        <Provider store={store}>
-          <AuthProvider>
-            <Navigation />
-          </AuthProvider>
-        </Provider>
+      <Provider store={store}>
+        <AuthProvider>
+          <Navigation />
+        </AuthProvider>
+      </Provider>
     </NavigationContainer>
   );
 }

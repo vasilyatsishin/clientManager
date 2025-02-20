@@ -1,4 +1,8 @@
-import { LoginResponse, RefreshTokenResponse, UserInfoResponse } from "../interfaces/interfaces";
+import {
+  LoginResponse,
+  RefreshTokenResponse,
+  UserInfoResponse,
+} from "../interfaces/interfaces";
 
 export const login = (bosId: number): LoginResponse => {
   // try {
@@ -20,13 +24,16 @@ export const login = (bosId: number): LoginResponse => {
   //   return null;
   // }
 
-  return{
-    exist: true, bosId
-  }
+  return {
+    exist: true,
+    bosId,
+  };
 };
 
-
-export const confirmationByTg = async (tgCode: string, bosId: number): Promise<UserInfoResponse | null> => {
+export const confirmationByTg = async (
+  tgCode: string,
+  bosId: number
+): Promise<UserInfoResponse | null> => {
   // try{
   //   const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
   //     method: "POST",
@@ -38,9 +45,9 @@ export const confirmationByTg = async (tgCode: string, bosId: number): Promise<U
   //       bosId: bosId
   //     }),
   //   });
-    
+
   //   const data: UserInfoResponse = await response.json()
-  
+
   //   return{
   //     name: data.name
   //   }
@@ -48,12 +55,11 @@ export const confirmationByTg = async (tgCode: string, bosId: number): Promise<U
   //   return null
   // }
 
-  
   return {
     name: "Vasyl",
-    sector: ["food", "nonfood"]
-  }
-}
+    sector: ["food"],
+  };
+};
 
 export const refreshToken = async (
   refreshToken: string
@@ -80,6 +86,6 @@ export const refreshToken = async (
 
   return {
     refreshToken: "dfgdfg",
-    accessToken: "sdfsd"
-  }
+    accessToken: "sdfsd",
+  };
 };

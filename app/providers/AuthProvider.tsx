@@ -30,7 +30,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   useEffect(() => {
-    // setUser({ name: "Vasyl", sector: ["food"] });
+    // setUser({ name: "Vasyl", sector: ["nonfood"] });
   }, []);
 
   const loginHandler = async (bosId: number) => {

@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useRef, useState } from "react";
 import {
   Text,
   TextInput,
@@ -39,6 +39,7 @@ const Confirmation: FC = () => {
       console.log(error);
     }
   };
+
   const confirm = async () => {
     if (otp.length !== maxLength) {
       setIsFilled(false);
@@ -51,6 +52,7 @@ const Confirmation: FC = () => {
         otp,
         selector.bosId
       );
+
       if (response) {
         setUser(response);
         dispatch(setUserInfo(response));
@@ -117,7 +119,7 @@ const Confirmation: FC = () => {
           otp.length !== maxLength && styles.buttonDisabled,
         ]}
         onPress={confirm}
-        disabled={isFilled} // Заборонити натискати кнопку, якщо код не введено повністю
+        disabled={otp.length !== maxLength}
       >
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
