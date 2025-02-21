@@ -57,7 +57,7 @@ export const confirmationByTg = async (
 
   return {
     name: "Vasyl",
-    sector: ["food"],
+    sector: ["food", "nonfood"],
   };
 };
 

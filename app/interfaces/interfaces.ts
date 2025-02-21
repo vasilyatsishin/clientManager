@@ -38,3 +38,8 @@ export interface authState {
   bosId: number;
   user: UserInfoResponse;
 }
+
+export interface documentsState {
+  typeOfShownDocuments: string;
+}
+

@@ -15,6 +15,7 @@ import { setIsExist } from "../redux/slices/authSlice";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "../navigation/types";
+import { changeTheme } from "../redux/slices/generalSlice";
 
 export const AuthContext = createContext<IContext>({} as IContext);
 
@@ -30,7 +31,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   useEffect(() => {
-    // setUser({ name: "Vasyl", sector: ["nonfood"] });
+    setUser({ name: "Vasyl", sector: ["food",  "nonfood"] });
   }, []);
 
   const loginHandler = async (bosId: number) => {
