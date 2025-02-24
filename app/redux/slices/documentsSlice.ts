@@ -1,21 +1,26 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { documentsState } from "../../interfaces/interfaces";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DocumentsState } from "../../interfaces/interfaces";
 
-const initialState: documentsState = {
-  typeOfShownDocuments: "not sended"
+const initialState = {
+  documents: {} as DocumentsState,
 };
 
 const documentsSlice = createSlice({
-  name: "Documents",
+  name: "documents",
   initialState,
   reducers: {
-    changeTypeOfShownDocuments: (state, action: { payload: string }) => {
-      state.typeOfShownDocuments = action.payload;
+    setDocuments: (
+      state,
+      action: PayloadAction<{ business: string; type: "sended" | "not sended"; documents: any[] }>
+    ) => {
+      const { business, type, documents } = action.payload;
+      if (!state.documents[business]) {
+        state.documents[business] = {};
+      }
+      state.documents[business][type] = documents;
     },
   },
 });
 
-export const {
-  changeTypeOfShownDocuments
-} = documentsSlice.actions;
+export const { setDocuments } = documentsSlice.actions;
 export default documentsSlice.reducer;

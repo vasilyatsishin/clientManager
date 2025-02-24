@@ -43,3 +43,10 @@ export interface documentsState {
   typeOfShownDocuments: string;
 }
 
+export interface DocumentsState {
+  [business: string]: {
+    sended?: any[];
+    notSended?: any[];
+  };
+}
+
