@@ -6,7 +6,6 @@ export interface UserInterface {
 export interface IContext {
   user: UserInterface | null;
   isLoading: boolean;
-  login: (bosId: number) => object;
   logout: () => object;
   setUser: (user: UserInfoResponse) => void;
 }

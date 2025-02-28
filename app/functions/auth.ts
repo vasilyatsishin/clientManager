@@ -4,31 +4,31 @@ import {
   UserInfoResponse,
 } from "../interfaces/interfaces";
 
-export const login = (bosId: number): LoginResponse => {
-  // try {
-  //   const response = await fetch("https://jsonplaceholder.typicode.com/posts", { // Перевір URL
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ bosId }),
-  //   });
+export const login = async (bosId: number): Promise<LoginResponse> => {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bosId }),
+    });
 
-  //   if (!response.ok) {
-  //     console.error("Login error:", response.status, await response.text()); // Лог тексту відповіді
-  //     return null;
-  //   }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Login error: ${response.status} - ${errorText}`);
+    }
 
-  //   const data: LoginResponse = await response.json();
-  //   return { exist: data.exist, bosId };
-  // } catch (error) {
-  //   console.error("Fetch error:", error);
-  //   return null;
-  // }
+    const data: LoginResponse = await response.json();
 
-  return {
-    exist: true,
-    bosId,
-  };
+    if (!data.exist) {
+      throw new Error("Користувач не знайдений.");
+    }
+
+    return { exist: data.exist, bosId };
+  } catch (error: any) {
+    throw error;
+  }
 };
+
 
 export const confirmationByTg = async (
   tgCode: string,

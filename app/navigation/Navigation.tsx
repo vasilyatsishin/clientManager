@@ -15,9 +15,13 @@ import Chat from "../components/screens/Chat";
 const Stack = createNativeStackNavigator<TypeRootStackParamList>();
 
 const Navigation: FC = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const activePage = useSelector(
     (state: RootState) => state.generalSlice.activePage
+  );
+
+  const user = useSelector(
+    (state: RootState) => state.authSlice.user
   );
   return (
     <>

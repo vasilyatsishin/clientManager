@@ -26,8 +26,6 @@ const Confirmation: FC = () => {
   const selector = useSelector((state: RootState) => state.authSlice);
   const dispatch = useDispatch();
   const { user, setUser } = useAuth();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   const choosingSector = async (sector: string[]) => {
     try {
@@ -173,7 +171,7 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   buttonDisabled: {
-    backgroundColor: "grey", // Кнопка стає сірою, якщо не всі цифри введені
+    backgroundColor: "grey"
   },
 });
 

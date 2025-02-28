@@ -1,9 +1,13 @@
 import { FC, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  setDocuments,
-} from "../../redux/slices/documentsSlice";
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { setDocuments } from "../../redux/slices/documentsSlice";
 import { RootState } from "../../redux/store";
 import {
   getDocumentsFromServer,
@@ -16,16 +20,16 @@ const Documents: FC = () => {
     "not sended" | "sended"
   >("not sended");
   const dispatch = useDispatch();
-  const business = useSelector((state: RootState) => state.generalSlice.theme); // "food" або "nonfood"
+  const business = useSelector((state: RootState) => state.generalSlice.theme);
   const storedDocuments = useSelector(
     (state: RootState) =>
-      state.documentsSlice.documents[business]
+      state.documentsSlice.documents[business]?.[typeOfShownDocuments]
   );
 
   useEffect(() => {
     dispatch(changeActivePage("Заявки"));
 
-    if (storedDocuments) {
+    if (storedDocuments?.length) {
       return;
     }
 
@@ -37,18 +41,14 @@ const Documents: FC = () => {
         } else {
           documents = await getDocumentsFromServer(business);
         }
-        
-        dispatch(
-          setDocuments({ business, type: typeOfShownDocuments, documents })
-        );
-        
+
+        dispatch(setDocuments({ business, type: typeOfShownDocuments, documents }));
       } catch (error) {
         console.error("Помилка завантаження документів:", error);
       }
     };
 
     fetchData();
-
   }, [typeOfShownDocuments, business]);
 
   return (
@@ -57,17 +57,12 @@ const Documents: FC = () => {
         <TouchableOpacity
           disabled={typeOfShownDocuments === "not sended"}
           style={styles.typeOfDocumentsButton}
-          onPress={() => {
-            setTypeOfShownDocuments("not sended")
-          }}
+          onPress={() => setTypeOfShownDocuments("not sended")}
         >
           <Text
             style={[
               styles.buttonText,
-              {
-                fontWeight:
-                  typeOfShownDocuments === "not sended" ? "bold" : "normal",
-              },
+              { fontWeight: typeOfShownDocuments === "not sended" ? "bold" : "normal" },
             ]}
           >
             Невідправлені
@@ -81,28 +76,29 @@ const Documents: FC = () => {
           <Text
             style={[
               styles.buttonText,
-              {
-                fontWeight:
-                  typeOfShownDocuments === "sended" ? "bold" : "normal",
-              },
+              { fontWeight: typeOfShownDocuments === "sended" ? "bold" : "normal" },
             ]}
           >
             Відправлені
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.containerForMainContent}>
-        <Text style={styles.textForEmptyPage}>
-          Ви будете бачити тут{" "}
-          {typeOfShownDocuments === "sended" ? "відправлені" : "невідправлені"}{" "}
-          заявки. Поки що тут пусто.
-        </Text>
-      </View>
+
+      <FlatList
+        data={storedDocuments}
+        keyExtractor={(item, index) => String(index)}
+        renderItem={({ item }) => <Text style={styles.documentText}>{item.body}</Text>}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
+        ListEmptyComponent={
+          <Text style={styles.textForEmptyPage}>
+            Ви будете бачити тут {typeOfShownDocuments === "sended" ? "відправлені" : "невідправлені"} заявки. Поки що тут пусто.
+          </Text>
+        }
+      />
     </View>
   );
 };
 
-// 🔹 **Стилі**
 const styles = StyleSheet.create({
   mainContainer: { flex: 1 },
   typeOfDocumentsButtonsContainer: {
@@ -113,11 +109,7 @@ const styles = StyleSheet.create({
   },
   typeOfDocumentsButton: {},
   buttonText: { fontSize: 25 },
-  containerForMainContent: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  documentText: { fontSize: 18, marginVertical: 10 },
   textForEmptyPage: { width: 200, fontSize: 20, textAlign: "center" },
 });
 

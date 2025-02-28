@@ -36,12 +36,12 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) =>
     setError(null); // Очищаємо попередню помилку
 
     try {
+      // await AsyncStorage.setItem("sectors", JSON.stringify(["food", "nonfood"]))
       let savedTheme = await AsyncStorage.getItem("theme");
       let savedSectors = await AsyncStorage.getItem("sectors")
 
       dispatch(changeTheme(savedTheme));
       dispatch(changeSectors(JSON.parse(savedSectors)));
-      setUser({ name: "Vasyl", sector: ["food", "nonfood"] });
     } catch (error) {
       console.error("Помилка ініціалізації:", error);
       setError("Не вдалося завантажити дані. Перевірте інтернет і повторіть спробу.");
@@ -54,20 +54,6 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) =>
     initializeApp();
   }, []);
 
-  const loginHandler = async (bosId: number) => {
-    setIsLoading(true);
-    try {
-      const response = login(bosId);
-      if (response.exist) {
-        dispatch(setIsExist(true));
-      }
-      navigation.navigate("Confirmation");
-    } catch (error: any) {
-      Alert.alert("Login Error", error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const logoutHandler = async () => {
     setIsLoading(true);
@@ -87,7 +73,6 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) =>
       user,
       isLoading,
       setUser,
-      login: loginHandler,
       logout: logoutHandler,
     }),
     [user, isLoading]
