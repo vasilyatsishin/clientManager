@@ -10,11 +10,19 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { login } from "../../functions/auth";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
+import { TypeRootStackParamList } from "../../navigation/types";
+import { useDispatch } from "react-redux";
+import { setBosId } from "../../redux/slices/authSlice";
 
 const Auth = () => {
-  const [bosId, setBosId] = useState<string>("");
+  const [bosId, setBosIdLocal] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   const logo = require("../../assets/img/logoBertaGroupWithoutText.png");
   const icon = require("../../assets/img/infoIcon.png");
@@ -26,6 +34,9 @@ const Auth = () => {
     }
 
     const bosIdNumber = Number(bosId);
+    console.log(bosIdNumber);
+    dispatch(setBosId(bosIdNumber));
+    
     if (isNaN(bosIdNumber) || bosIdNumber <= 0) {
       setErrorMessage("Berta-ID має бути додатним числом");
       return;
@@ -35,6 +46,7 @@ const Auth = () => {
 
     try {
       await login(bosIdNumber);
+      navigation.navigate("Confirmation")
     } catch (error: any) {
       setErrorMessage(error.message);
     }
@@ -54,7 +66,7 @@ const Auth = () => {
               style={[styles.input]}
               keyboardType="numeric"
               onChangeText={(text) => {
-                setBosId(text.replace(/[^0-9]/g, ""));
+                setBosIdLocal(text.replace(/[^0-9]/g, ""));
                 setErrorMessage("");
               }}
             />

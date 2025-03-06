@@ -46,18 +46,13 @@ const Confirmation: FC = () => {
     setIsFilled(true);
 
     try {
-      const response: UserInterface = await confirmationByTg(
+      const response = await confirmationByTg(
         otp,
         selector.bosId
       );
 
-      if (response) {
-        setUser(response);
-        dispatch(setUserInfo(response));
-        choosingSector(response.sector);
-      } else {
-        console.log("Невірний код");
-      }
+      
+      
     } catch (error) {
       console.log(error);
     }

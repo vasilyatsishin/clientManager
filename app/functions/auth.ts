@@ -6,61 +6,48 @@ import {
 
 export const login = async (bosId: number): Promise<LoginResponse> => {
   try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bosId }),
-    });
+    const response = await fetch(
+      `http://10.0.101.36:8066/auth/request-otp?employeeCode=${bosId}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Login error: ${response.status} - ${errorText}`);
+    if (response.status === 400) {
+      throw new Error("Користувача не знайдено");
     }
 
-    const data: LoginResponse = await response.json();
-
-    if (!data.exist) {
-      throw new Error("Користувач не знайдений.");
-    }
-
-    return { exist: data.exist, bosId };
+    return { exist: true, bosId };
   } catch (error: any) {
-    throw error;
+    throw new Error(error.message)
   }
 };
-
 
 export const confirmationByTg = async (
   tgCode: string,
   bosId: number
-): Promise<UserInfoResponse | null> => {
-  // try{
-  //   const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       tgCode: tgCode,
-  //       bosId: bosId
-  //     }),
-  //   });
+) => {
+  try {
+    const response = await fetch(`http://10.0.101.36:8066/auth/login?employeeCode=${bosId}&password=${tgCode}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  //   const data: UserInfoResponse = await response.json()
+    // Логування для перевірки значень
+    console.log(bosId);
+    console.log(tgCode);
 
-  //   return{
-  //     name: data.name
-  //   }
-  // } catch(error) {
-  //   return null
-  // }
+    // Отримання статусу відповіді
+    const data = await response.json(); // Якщо це JSON, а не просто статус
+    console.log(data);
 
-  return {
-    name: "Vasyl",
-    sector: ["food", "nonfood"],
-  };
+  } catch (error:any) {
+    throw new Error(error)
+  }
 };
-
 export const refreshToken = async (
   refreshToken: string
 ): Promise<RefreshTokenResponse | null> => {

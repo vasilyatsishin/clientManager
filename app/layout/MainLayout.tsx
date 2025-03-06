@@ -39,6 +39,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
 
   useEffect(() => {
     const loadTheme = async () => {
+      // await AsyncStorage.setItem("sectors", JSON.stringify(["food", "nonfood"]))
       const storedTheme = await AsyncStorage.getItem("theme");
       if (storedTheme) {
         dispatch(changeTheme(storedTheme));

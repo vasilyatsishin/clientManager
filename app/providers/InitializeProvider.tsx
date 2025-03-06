@@ -26,14 +26,14 @@ interface InitializeProviderProps {
 export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserInterface | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); // Додаємо стан для помилки
+  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigation =
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   const initializeApp = async () => {
     setIsLoading(true);
-    setError(null); // Очищаємо попередню помилку
+    setError(null);
 
     try {
       // await AsyncStorage.setItem("sectors", JSON.stringify(["food", "nonfood"]))
