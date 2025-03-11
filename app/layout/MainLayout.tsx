@@ -71,7 +71,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
     <SafeAreaProvider>
       <SafeAreaView
         style={{
-          backgroundColor: theme === "food" ? colors.food : colors.nonfood,
+          backgroundColor: theme === "Food" ? colors.food : colors.nonfood,
         }}
         edges={["top"]}
       >
@@ -80,7 +80,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
           style={[
             styles.upperNav,
             {
-              backgroundColor: theme === "food" ? colors.food : colors.nonfood,
+              backgroundColor: theme === "Food" ? colors.food : colors.nonfood,
             },
           ]}
         >
@@ -161,12 +161,12 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
                         styles.chooseButton,
                         {
                           backgroundColor:
-                            sector === "food" ? colors.food : colors.nonfood,
+                            sector === "Food" ? colors.food : colors.nonfood,
                         },
                       ]}
                     >
                       <Text style={styles.buttonText}>
-                        {sector === "food" ? "Food" : "Non-Food"}
+                        {sector === "Food" ? "Food" : "Non-Food"}
                       </Text>
                     </TouchableOpacity>
                   ))}

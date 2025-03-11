@@ -34,7 +34,6 @@ const Auth = () => {
     }
 
     const bosIdNumber = Number(bosId);
-    console.log(bosIdNumber);
     dispatch(setBosId(bosIdNumber));
     
     if (isNaN(bosIdNumber) || bosIdNumber <= 0) {

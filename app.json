@@ -1,4 +1,7 @@
 {
   "name": "rn-ts",
-  "slug": "rn-ts"
+  "slug": "rn-ts",
+  "plugins": [
+    "expo-secure-store"
+  ]
 }

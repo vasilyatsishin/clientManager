@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "./types";
-import { useAuth } from "../hooks/useAuth";
 import Auth from "../components/screens/Auth";
 import Confirmation from "../components/screens/Confirmation";
 import Documents from "../components/screens/Documents";

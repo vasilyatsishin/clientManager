@@ -7,15 +7,13 @@ import {
   ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IContext, UserInterface } from "../interfaces/interfaces";
-import { Alert, Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
-import { login } from "../functions/auth";
+import { IContext, UserInfoResponse } from "../interfaces/interfaces";
+import { Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useDispatch } from "react-redux";
-import { setIsExist } from "../redux/slices/authSlice";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { TypeRootStackParamList } from "../navigation/types";
 import { changeSectors, changeTheme } from "../redux/slices/generalSlice";
+import { isTokenExpired, parseJwt, refresh } from "../functions/auth";
+import * as SecureStore from "expo-secure-store";
+import { setAccessToken, setUserInfo } from "../redux/slices/authSlice";
 
 export const InitializeContext = createContext<IContext>({} as IContext);
 
@@ -23,57 +21,83 @@ interface InitializeProviderProps {
   children: ReactNode;
 }
 
-export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserInterface | null>(null);
+export const InitializeProvider: FC<InitializeProviderProps> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<UserInfoResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
-
   const initializeApp = async () => {
+    // await SecureStore.deleteItemAsync("refreshToken")
+    // await AsyncStorage.removeItem("accessToken")
     setIsLoading(true);
     setError(null);
-
-    try {
-      // await AsyncStorage.setItem("sectors", JSON.stringify(["food", "nonfood"]))
-      let savedTheme = await AsyncStorage.getItem("theme");
-      let savedSectors = await AsyncStorage.getItem("sectors")
-
-      dispatch(changeTheme(savedTheme));
-      dispatch(changeSectors(JSON.parse(savedSectors)));
-    } catch (error) {
-      console.error("Помилка ініціалізації:", error);
-      setError("Не вдалося завантажити дані. Перевірте інтернет і повторіть спробу.");
-    } finally {
+    const accessToken = await AsyncStorage.getItem("accessToken")
+    
+    if(accessToken != null) {
+      try {
+        let token = await AsyncStorage.getItem("accessToken");       
+        const expiredToken = isTokenExpired(accessToken);
+        
+        if (expiredToken) {
+          const refreshToken = await SecureStore.getItemAsync("refreshToken");
+          const { accessToken } = await refresh(refreshToken);
+          await AsyncStorage.setItem("accessToken", accessToken);
+          token = await AsyncStorage.getItem("accessToken");
+          const savedTheme = await AsyncStorage.getItem("theme");
+          const userId = await AsyncStorage.getItem("userId");
+          const savedSectors = await AsyncStorage.getItem("sectors");
+  
+          dispatch(setAccessToken(token))
+          dispatch(changeTheme(savedTheme));
+          dispatch(changeSectors(JSON.parse(savedSectors)));
+          dispatch(
+            setUserInfo({
+              sector: JSON.parse(savedSectors),
+              userId: JSON.parse(userId),
+            })
+          );
+        } else {
+          const savedTheme = await AsyncStorage.getItem("theme");
+          const userId = await AsyncStorage.getItem("userId");
+          const savedSectors = await AsyncStorage.getItem("sectors");
+          const token = await AsyncStorage.getItem("accessToken")
+  
+          dispatch(setAccessToken(token))
+          dispatch(changeTheme(savedTheme));
+          dispatch(changeSectors(JSON.parse(savedSectors)));
+          dispatch(
+            setUserInfo({
+              sector: JSON.parse(savedSectors),
+              userId: JSON.parse(userId),
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Помилка ініціалізації:", error);
+        setError(
+          "Не вдалося завантажити дані. Перевірте інтернет і повторіть спробу."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
       setIsLoading(false);
     }
   };
+
 
   useEffect(() => {
     initializeApp();
   }, []);
-
-
-  const logoutHandler = async () => {
-    setIsLoading(true);
-    try {
-      await AsyncStorage.removeItem("token");
-      await AsyncStorage.removeItem("refreshToken");
-      setUser(null);
-    } catch (error) {
-      console.error("Logout Error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const value = useMemo(
     () => ({
       user,
       isLoading,
       setUser,
-      logout: logoutHandler,
+      initializeApp
     }),
     [user, isLoading]
   );
@@ -90,7 +114,9 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) =>
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ marginBottom: 10, color: "red", textAlign: "center" }}>{error}</Text>
+        <Text style={{ marginBottom: 10, color: "red", textAlign: "center" }}>
+          {error}
+        </Text>
         <TouchableOpacity
           onPress={initializeApp}
           style={{
@@ -99,11 +125,17 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({ children }) =>
             borderRadius: 5,
           }}
         >
-          <Text style={{ color: "white", fontWeight: "bold" }}>Повторити спробу</Text>
+          <Text style={{ color: "white", fontWeight: "bold" }}>
+            Повторити спробу
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  return <InitializeContext.Provider value={value}>{children}</InitializeContext.Provider>;
+  return (
+    <InitializeContext.Provider value={value}>
+      {children}
+    </InitializeContext.Provider>
+  );
 };

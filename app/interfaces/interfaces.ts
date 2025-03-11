@@ -1,18 +1,13 @@
-export interface UserInterface {
-  name: string;
-  sector: string[];
-}
 
 export interface IContext {
-  user: UserInterface | null;
+  user: UserInfoResponse | null;
   isLoading: boolean;
-  logout: () => object;
   setUser: (user: UserInfoResponse) => void;
+  initializeApp: () => void
 }
 
 export interface RefreshTokenResponse {
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface LoginResponse {
@@ -21,7 +16,7 @@ export interface LoginResponse {
 }
 
 export interface UserInfoResponse {
-  name: string;
+  userId: number;
   sector: string[];
 }
 
@@ -36,6 +31,7 @@ export interface authState {
   exist: boolean;
   bosId: number;
   user: UserInfoResponse;
+  accessToken: string;
 }
 
 export interface documentsState {

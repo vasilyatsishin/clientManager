@@ -14,13 +14,17 @@ import {
   getDocumentsFromLocalDB,
 } from "../../functions/documents";
 import { changeActivePage } from "../../redux/slices/generalSlice";
-
+import { useAuth } from "../../hooks/useAuth";
+import { refresh } from "../../functions/auth";
+import { setAccessToken, setUserInfo } from "../../redux/slices/authSlice";
+import { initDatabase } from "../../sqlite/sqlite";
 const Documents: FC = () => {
   const [typeOfShownDocuments, setTypeOfShownDocuments] = useState<
     "not sended" | "sended"
   >("not sended");
   const dispatch = useDispatch();
   const business = useSelector((state: RootState) => state.generalSlice.theme);
+  const token = useSelector((state: RootState) => state.authSlice.accessToken);
   const storedDocuments = useSelector(
     (state: RootState) =>
       state.documentsSlice.documents[business]?.[typeOfShownDocuments]
@@ -28,7 +32,6 @@ const Documents: FC = () => {
 
   useEffect(() => {
     dispatch(changeActivePage("Заявки"));
-
     if (storedDocuments?.length) {
       return;
     }
@@ -39,17 +42,23 @@ const Documents: FC = () => {
         if (typeOfShownDocuments === "not sended") {
           documents = await getDocumentsFromLocalDB(business);
         } else {
+          const { accessToken } = await refresh(token);
+          dispatch(setAccessToken(accessToken));
           documents = await getDocumentsFromServer(business);
         }
 
-        dispatch(setDocuments({ business, type: typeOfShownDocuments, documents }));
-      } catch (error) {
-        console.error("Помилка завантаження документів:", error);
+        dispatch(
+          setDocuments({ business, type: typeOfShownDocuments, documents })
+        );
+      } catch (error: any) {
+        if(error.message == "401"){
+          dispatch(setUserInfo(null))
+        }
       }
     };
 
     fetchData();
-  }, [typeOfShownDocuments, business]);
+  }, [typeOfShownDocuments, business, token]);
 
   return (
     <View style={styles.mainContainer}>
@@ -62,7 +71,10 @@ const Documents: FC = () => {
           <Text
             style={[
               styles.buttonText,
-              { fontWeight: typeOfShownDocuments === "not sended" ? "bold" : "normal" },
+              {
+                fontWeight:
+                  typeOfShownDocuments === "not sended" ? "bold" : "normal",
+              },
             ]}
           >
             Невідправлені
@@ -76,7 +88,10 @@ const Documents: FC = () => {
           <Text
             style={[
               styles.buttonText,
-              { fontWeight: typeOfShownDocuments === "sended" ? "bold" : "normal" },
+              {
+                fontWeight:
+                  typeOfShownDocuments === "sended" ? "bold" : "normal",
+              },
             ]}
           >
             Відправлені
@@ -87,11 +102,21 @@ const Documents: FC = () => {
       <FlatList
         data={storedDocuments}
         keyExtractor={(item, index) => String(index)}
-        renderItem={({ item }) => <Text style={styles.documentText}>{item.body}</Text>}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
+        renderItem={({ item }) => (
+          <Text style={styles.documentText}>{item.body}</Text>
+        )}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
         ListEmptyComponent={
           <Text style={styles.textForEmptyPage}>
-            Ви будете бачити тут {typeOfShownDocuments === "sended" ? "відправлені" : "невідправлені"} заявки. Поки що тут пусто.
+            Ви будете бачити тут{" "}
+            {typeOfShownDocuments === "sended"
+              ? "відправлені"
+              : "невідправлені"}{" "}
+            заявки. Поки що тут пусто.
           </Text>
         }
       />

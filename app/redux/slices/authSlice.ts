@@ -5,6 +5,7 @@ const initialState: authState = {
   exist: false,
   bosId: null,
   user: null,
+  accessToken: ""
 };
 
 const authSlice = createSlice({
@@ -20,8 +21,11 @@ const authSlice = createSlice({
     setUserInfo: (state, action: { payload: UserInfoResponse }) => {
       state.user = action.payload;
     },
+    setAccessToken: (state, action: { payload: string }) => {
+      state.accessToken = action.payload;
+    },
   },
 });
 
-export const { setIsExist, setBosId, setUserInfo } = authSlice.actions;
+export const { setIsExist, setBosId, setUserInfo, setAccessToken } = authSlice.actions;
 export default authSlice.reducer;

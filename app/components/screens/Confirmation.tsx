@@ -9,10 +9,6 @@ import {
 import { confirmationByTg } from "../../functions/auth";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { UserInterface } from "../../interfaces/interfaces";
-import { useNavigation } from "@react-navigation/native";
-import { TypeRootStackParamList } from "../../navigation/types";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "../../hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from "../../redux/slices/authSlice";
@@ -22,10 +18,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Confirmation: FC = () => {
   const [otp, setOtp] = useState<string>("");
   const [isFilled, setIsFilled] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const inputsRef = useRef<(TextInput | null)[]>([]);
   const selector = useSelector((state: RootState) => state.authSlice);
   const dispatch = useDispatch();
-  const { user, setUser } = useAuth();
+  const { setUser } = useAuth();
 
   const choosingSector = async (sector: string[]) => {
     try {
@@ -46,15 +43,18 @@ const Confirmation: FC = () => {
     setIsFilled(true);
 
     try {
-      const response = await confirmationByTg(
-        otp,
-        selector.bosId
-      );
+      const response = await confirmationByTg(otp, selector.bosId);
 
-      
-      
-    } catch (error) {
-      console.log(error);
+      if (response) {
+        dispatch(setUserInfo(response));
+        choosingSector(response.sector)
+        setUser({
+          userId: response.userId,
+          sector: response.sector
+        })
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message);
     }
   };
 
@@ -105,6 +105,9 @@ const Confirmation: FC = () => {
             />
           </View>
         ))}
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
       </View>
       <TouchableOpacity
         style={[
@@ -139,12 +142,13 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 10,
   },
   inputWrapper: {
     marginHorizontal: 5,
   },
   input: {
-    width: 40,
+    width: 50,
     height: 50,
     borderBottomWidth: 2,
     borderColor: "#202d3a",
@@ -166,7 +170,15 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
   buttonDisabled: {
-    backgroundColor: "grey"
+    backgroundColor: "grey",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    // marginTop: 5,
+    marginLeft: 5,
+    position: "absolute",
+    top: 55,
   },
 });
 
