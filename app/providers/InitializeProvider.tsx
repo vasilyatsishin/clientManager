@@ -30,8 +30,8 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
   const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const dispatch = useDispatch();
   const initializeApp = async () => {
-    await SecureStore.deleteItemAsync("refreshToken")
-    await AsyncStorage.removeItem("accessToken")
+    // await SecureStore.deleteItemAsync("refreshToken")
+    // await AsyncStorage.removeItem("accessToken")
     setIsInitializing(true);
     setError(null);
     const accessToken = await AsyncStorage.getItem("accessToken");

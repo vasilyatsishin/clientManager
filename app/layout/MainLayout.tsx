@@ -9,6 +9,7 @@ import {
   Animated,
   Dimensions,
   TouchableWithoutFeedback,
+  Modal,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
@@ -35,11 +36,11 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
   const menuAnimation = useRef(new Animated.Value(screenWidth)).current;
 
   useEffect(() => {
     const loadTheme = async () => {
-      // await AsyncStorage.setItem("sectors", JSON.stringify(["food", "nonfood"]))
       const storedTheme = await AsyncStorage.getItem("theme");
       if (storedTheme) {
         dispatch(changeTheme(storedTheme));
@@ -130,50 +131,30 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
               style={styles.icon}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Chat")}
-          >
-            <Image
-              source={require("../assets/img/chat.png")}
-              style={styles.icon}
-            />
+          <TouchableOpacity style={styles.button} onPress={() => setIsChatMenuOpen(true)}>
+            <Image source={require("../assets/img/chat.png")} style={styles.icon} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {isMenuOpen && (
-        <TouchableWithoutFeedback onPress={closeMenu}>
+      {/* Меню чату */}
+      <Modal transparent visible={isChatMenuOpen} animationType="fade" onRequestClose={() => setIsChatMenuOpen(false)}>
+        <TouchableWithoutFeedback onPress={() => setIsChatMenuOpen(false)}>
           <View style={styles.overlay}>
-            <Animated.View
-              style={[styles.menuContainer, { left: menuAnimation }]}
-            >
-              <View style={styles.containerForButtons}>
-                {sectors.length > 1 &&
-                  sectors.map((sector, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => {
-                        dispatch(changeTheme(sector));
-                      }}
-                      style={[
-                        styles.chooseButton,
-                        {
-                          backgroundColor:
-                            sector === "Food" ? colors.food : colors.nonfood,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.buttonText}>
-                        {sector === "Food" ? "Food" : "Non-Food"}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-              </View>
-            </Animated.View>
+            <View style={styles.chatMenu}>
+              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 1 */}}>
+                <Text style={styles.chatMenuText}>Опція 1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 2 */}}>
+                <Text style={styles.chatMenuText}>Опція 2</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 3 */}}>
+                <Text style={styles.chatMenuText}>Опція 3</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableWithoutFeedback>
-      )}
+      </Modal>
     </SafeAreaProvider>
   );
 };
@@ -259,6 +240,25 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 30,
+  },
+  chatMenu: {
+    position: "absolute",
+    bottom: 100,
+    right: 20,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  chatMenuItem: {
+    padding: 10,
+  },
+  chatMenuText: {
+    fontSize: 16,
+    color: "black",
   },
 });
 
