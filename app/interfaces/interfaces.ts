@@ -3,7 +3,8 @@ export interface IContext {
   user: UserInfoResponse | null;
   isLoading: boolean;
   setUser: (user: UserInfoResponse) => void;
-  initializeApp: () => void
+  initializeApp: () => void,
+  setIsLoading: (isLoading: boolean) => void
 }
 
 export interface RefreshTokenResponse {

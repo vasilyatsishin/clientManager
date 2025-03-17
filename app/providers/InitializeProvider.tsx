@@ -11,7 +11,7 @@ import { IContext, UserInfoResponse } from "../interfaces/interfaces";
 import { Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useDispatch } from "react-redux";
 import { changeSectors, changeTheme } from "../redux/slices/generalSlice";
-import { isTokenExpired, parseJwt, refresh } from "../functions/auth";
+import { isTokenExpired, refresh } from "../functions/auth";
 import * as SecureStore from "expo-secure-store";
 import { setAccessToken, setUserInfo } from "../redux/slices/authSlice";
 
@@ -25,54 +25,62 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
   children,
 }) => {
   const [user, setUser] = useState<UserInfoResponse | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const dispatch = useDispatch();
   const initializeApp = async () => {
-    // await SecureStore.deleteItemAsync("refreshToken")
-    // await AsyncStorage.removeItem("accessToken")
-    setIsLoading(true);
+    await SecureStore.deleteItemAsync("refreshToken")
+    await AsyncStorage.removeItem("accessToken")
+    setIsInitializing(true);
     setError(null);
-    const accessToken = await AsyncStorage.getItem("accessToken")
-    
-    if(accessToken != null) {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+
+    const refreshingFunc = async (token: string) => {
+      const refreshToken = await SecureStore.getItemAsync("refreshToken");
+      const { accessToken } = await refresh(refreshToken);
+      await AsyncStorage.setItem("accessToken", accessToken);
+      token = await AsyncStorage.getItem("accessToken");
+      const savedTheme = await AsyncStorage.getItem("theme");
+      const userId = await AsyncStorage.getItem("userId");
+      const savedSectors = await AsyncStorage.getItem("sectors");
+
+      dispatch(setAccessToken(token));
+      dispatch(changeTheme(savedTheme));
+      dispatch(changeSectors(JSON.parse(savedSectors)));
+      dispatch(
+        setUserInfo({
+          sector: JSON.parse(savedSectors),
+          userId: JSON.parse(userId),
+        })
+      );
+    };
+
+    const initializingIfTokenValid = async () => {
+      const savedTheme = await AsyncStorage.getItem("theme");
+      const userId = await AsyncStorage.getItem("userId");
+      const savedSectors = await AsyncStorage.getItem("sectors");
+      const token = await AsyncStorage.getItem("accessToken");
+
+      dispatch(setAccessToken(token));
+      dispatch(changeTheme(savedTheme));
+      dispatch(changeSectors(JSON.parse(savedSectors)));
+      dispatch(
+        setUserInfo({
+          sector: JSON.parse(savedSectors),
+          userId: JSON.parse(userId),
+        })
+      );
+    }
+    if (accessToken != null) {
       try {
-        let token = await AsyncStorage.getItem("accessToken");       
+        let token = await AsyncStorage.getItem("accessToken");
         const expiredToken = isTokenExpired(accessToken);
-        
+
         if (expiredToken) {
-          const refreshToken = await SecureStore.getItemAsync("refreshToken");
-          const { accessToken } = await refresh(refreshToken);
-          await AsyncStorage.setItem("accessToken", accessToken);
-          token = await AsyncStorage.getItem("accessToken");
-          const savedTheme = await AsyncStorage.getItem("theme");
-          const userId = await AsyncStorage.getItem("userId");
-          const savedSectors = await AsyncStorage.getItem("sectors");
-  
-          dispatch(setAccessToken(token))
-          dispatch(changeTheme(savedTheme));
-          dispatch(changeSectors(JSON.parse(savedSectors)));
-          dispatch(
-            setUserInfo({
-              sector: JSON.parse(savedSectors),
-              userId: JSON.parse(userId),
-            })
-          );
+          refreshingFunc(token);
         } else {
-          const savedTheme = await AsyncStorage.getItem("theme");
-          const userId = await AsyncStorage.getItem("userId");
-          const savedSectors = await AsyncStorage.getItem("sectors");
-          const token = await AsyncStorage.getItem("accessToken")
-  
-          dispatch(setAccessToken(token))
-          dispatch(changeTheme(savedTheme));
-          dispatch(changeSectors(JSON.parse(savedSectors)));
-          dispatch(
-            setUserInfo({
-              sector: JSON.parse(savedSectors),
-              userId: JSON.parse(userId),
-            })
-          );
+          initializingIfTokenValid()
         }
       } catch (error) {
         console.error("Помилка ініціалізації:", error);
@@ -80,13 +88,12 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
           "Не вдалося завантажити дані. Перевірте інтернет і повторіть спробу."
         );
       } finally {
-        setIsLoading(false);
+        setIsInitializing(false);
       }
     } else {
-      setIsLoading(false);
+      setIsInitializing(false);
     }
   };
-
 
   useEffect(() => {
     initializeApp();
@@ -97,12 +104,13 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
       user,
       isLoading,
       setUser,
-      initializeApp
+      initializeApp,
+      setIsLoading
     }),
     [user, isLoading]
   );
 
-  if (isLoading) {
+  if (isInitializing) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />

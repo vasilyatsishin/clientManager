@@ -4,11 +4,11 @@ import { Provider } from "react-redux";
 import { store } from "./app/redux/store";
 import { NavigationContainer } from "@react-navigation/native";
 import { useEffect } from "react";
-import { initDatabase } from "./app/sqlite/sqlite";
+import { runMigrations } from "./app/sqlite/migrations";
 
 export default function App() {
   useEffect(() => {
-    initDatabase()
+    runMigrations()
   }, [])
   return (
     <NavigationContainer>

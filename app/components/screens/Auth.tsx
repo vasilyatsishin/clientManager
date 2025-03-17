@@ -8,18 +8,21 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useState } from "react";
+import { FC, useState } from "react";
 import { login } from "../../functions/auth";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 import { TypeRootStackParamList } from "../../navigation/types";
 import { useDispatch } from "react-redux";
 import { setBosId } from "../../redux/slices/authSlice";
+import { useAuth } from "../../hooks/useAuth";
+import Loader from "../components/Loader";
 
-const Auth = () => {
+const Auth: FC = () => {
   const [bosId, setBosIdLocal] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
+  const {isLoading, setIsLoading} = useAuth()
   const dispatch = useDispatch();
   const navigation =
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
@@ -44,10 +47,13 @@ const Auth = () => {
     setErrorMessage("");
 
     try {
+      setIsLoading(true)
       await login(bosIdNumber);
       navigation.navigate("Confirmation")
     } catch (error: any) {
       setErrorMessage(error.message);
+    } finally{
+      setIsLoading(false)
     }
   };
 
@@ -85,7 +91,7 @@ const Auth = () => {
           ) : null}
         </View>
         <TouchableOpacity style={styles.buttonAuth} onPress={handleLogin}>
-          <Text style={styles.textInButton}>Log In</Text>
+          <Text style={styles.textInButton}>{isLoading ? <Loader /> : "Log In"}</Text>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>

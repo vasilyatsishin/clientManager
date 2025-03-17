@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useAuth } from "../../hooks/useAuth";
 import { useDispatch } from "react-redux";
-import { setUserInfo } from "../../redux/slices/authSlice";
+import { setAccessToken, setUserInfo } from "../../redux/slices/authSlice";
 import { changeSectors, changeTheme } from "../../redux/slices/generalSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -48,6 +48,8 @@ const Confirmation: FC = () => {
       if (response) {
         dispatch(setUserInfo(response));
         choosingSector(response.sector)
+        const token = await AsyncStorage.getItem("accessToken")
+        dispatch(setAccessToken(token))
         setUser({
           userId: response.userId,
           sector: response.sector

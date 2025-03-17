@@ -14,10 +14,8 @@ import {
   getDocumentsFromLocalDB,
 } from "../../functions/documents";
 import { changeActivePage } from "../../redux/slices/generalSlice";
-import { useAuth } from "../../hooks/useAuth";
 import { refresh } from "../../functions/auth";
 import { setAccessToken, setUserInfo } from "../../redux/slices/authSlice";
-import { initDatabase } from "../../sqlite/sqlite";
 const Documents: FC = () => {
   const [typeOfShownDocuments, setTypeOfShownDocuments] = useState<
     "not sended" | "sended"
@@ -52,6 +50,7 @@ const Documents: FC = () => {
         );
       } catch (error: any) {
         if(error.message == "401"){
+          dispatch(setAccessToken(null))
           dispatch(setUserInfo(null))
         }
       }

@@ -95,7 +95,6 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
 
       <View style={styles.container}>
         <View style={styles.component}>{children}</View>
-
         <View
           style={[
             styles.bottomNav,
