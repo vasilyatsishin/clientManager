@@ -20,6 +20,7 @@ import { colors } from "../assets/colors";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "../navigation/types";
+import { red } from "react-native-reanimated/lib/typescript/Colors";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -34,10 +35,11 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
   const sectors = useSelector((state: RootState) => state.generalSlice.sectors);
   const navigation =
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
   const menuAnimation = useRef(new Animated.Value(screenWidth)).current;
+  const [isRotated, setIsRotated] = useState(false);
+  const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const loadTheme = async () => {
@@ -67,6 +69,20 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
       }).start(() => setIsMenuOpen(false));
     }
   };
+
+  const toggleRotation = () => {
+    Animated.timing(rotationAnim, {
+      toValue: isRotated ? 0 : 1, // 0 — стандартний стан, 1 — повернутий на 45 градусів
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    setIsRotated(!isRotated);
+  };
+
+  const rotateInterpolation = rotationAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "45deg"],
+  });
 
   return (
     <SafeAreaProvider>
@@ -100,61 +116,89 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
           style={[
             styles.bottomNav,
             {
-              backgroundColor: "#2F4F4F",
+              backgroundColor: "#223444",
             },
           ]}
         >
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Documents")}
+            onPress={() => navigation.navigate("NotSended")}
           >
             <Image
-              source={require("../assets/img/list.png")}
+              source={require("../assets/img/newIcon.png")}
               style={styles.icon}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("AddContragent")}
+            onPress={() => navigation.navigate("Sended")}
           >
             <Image
-              source={require("../assets/img/addContragent.png")}
+              source={require("../assets/img/sended.png")}
               style={styles.icon}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Route")}
+            onPress={() => navigation.navigate("Chat")}
           >
             <Image
-              source={require("../assets/img/routeIcon.png")}
+              source={require("../assets/img/chatIcon.png")}
               style={styles.icon}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => setIsChatMenuOpen(true)}>
-            <Image source={require("../assets/img/chat.png")} style={styles.icon} />
+          <TouchableOpacity
+            style={styles.buttonAdd}
+            onPress={() => {
+              toggleRotation();
+              setIsChatMenuOpen((prev) => !prev); // Перемикаємо стан модального вікна
+            }}
+          >
+            <View style={styles.redContainerButtonAdd}>
+              <Animated.Image
+                source={require("../assets/img/plusIcon.png")}
+                style={[
+                  styles.plusIcon,
+                  { transform: [{ rotate: rotateInterpolation }] },
+                ]}
+              />
+            </View>
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Меню чату */}
-      <Modal transparent visible={isChatMenuOpen} animationType="fade" onRequestClose={() => setIsChatMenuOpen(false)}>
-        <TouchableWithoutFeedback onPress={() => setIsChatMenuOpen(false)}>
+      {isMenuOpen && (
+        <TouchableWithoutFeedback onPress={closeMenu}>
           <View style={styles.overlay}>
-            <View style={styles.chatMenu}>
-              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 1 */}}>
-                <Text style={styles.chatMenuText}>Опція 1</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 2 */}}>
-                <Text style={styles.chatMenuText}>Опція 2</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.chatMenuItem} onPress={() => {/* Дія 3 */}}>
-                <Text style={styles.chatMenuText}>Опція 3</Text>
-              </TouchableOpacity>
-            </View>
+            <Animated.View
+              style={[styles.menuContainer, { left: menuAnimation }]}
+            >
+              <View style={styles.containerForButtons}>
+                {sectors.length > 1 &&
+                  sectors.map((sector, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        dispatch(changeTheme(sector));
+                      }}
+                      style={[
+                        styles.chooseButton,
+
+                        {
+                          backgroundColor:
+                            sector === "Food" ? colors.food : colors.nonfood,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.buttonText}>
+                        {sector === "Food" ? "Food" : "Non-Food"}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+              </View>
+            </Animated.View>
           </View>
         </TouchableWithoutFeedback>
-      </Modal>
+      )}
     </SafeAreaProvider>
   );
 };
@@ -163,37 +207,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-end",
+    backgroundColor: "white",
   },
   component: {
     flex: 1,
   },
   bottomNav: {
-    height: 70,
+    height: 60,
+    borderRadius: 15,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
   },
   upperNav: {
-    height: 60,
+    height: 50,
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
   },
-  icon: {
-    height: 35,
-    width: 35,
-  },
   iconUser: {
-    height: 35,
-    width: 35,
+    height: 40,
+    width: 40,
     borderRadius: 100,
     marginRight: 20,
   },
   button: {
-    width: "25%",
-    height: 70,
     alignItems: "center",
     justifyContent: "center",
+  },
+  icon: {
+    height: 34,
+    width: 46,
+    resizeMode: "contain",
   },
   overlay: {
     position: "absolute",
@@ -260,6 +305,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "black",
   },
+  buttonAdd: {
+    width: 60,
+    height: 60,
+    position: "static",
+    marginBottom: 35,
+  },
+  redContainerButtonAdd: {
+    width: 60,
+    height: 60,
+    borderRadius: 100,
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  plusIcon: {
+    width: 27.75,
+    height: 27.75,
+  },
+  plusIconWrapped: {},
 });
 
 export default MainLayout;

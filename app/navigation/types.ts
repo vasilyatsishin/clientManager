@@ -1,8 +1,8 @@
 export type TypeRootStackParamList = {
   Auth: undefined;
   Confirmation: undefined;
-  Route: undefined;
-  Documents: undefined;
+  NotSended: undefined;
+  Sended: undefined
   AddContragent: undefined;
   Chat: undefined;
 };

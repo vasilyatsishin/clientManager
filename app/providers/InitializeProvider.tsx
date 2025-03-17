@@ -14,6 +14,7 @@ import { changeSectors, changeTheme } from "../redux/slices/generalSlice";
 import { isTokenExpired, refresh } from "../functions/auth";
 import * as SecureStore from "expo-secure-store";
 import { setAccessToken, setUserInfo } from "../redux/slices/authSlice";
+import Preload from "../components/components/Preload";
 
 export const InitializeContext = createContext<IContext>({} as IContext);
 
@@ -30,9 +31,10 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
   const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const dispatch = useDispatch();
   const initializeApp = async () => {
-    // await SecureStore.deleteItemAsync("refreshToken")
-    // await AsyncStorage.removeItem("accessToken")
-    setIsInitializing(true);
+    setIsInitializing(true)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await SecureStore.deleteItemAsync("refreshToken")
+    await AsyncStorage.removeItem("accessToken")
     setError(null);
     const accessToken = await AsyncStorage.getItem("accessToken");
 
@@ -112,10 +114,7 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
 
   if (isInitializing) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={{ marginTop: 10 }}>Завантаження...</Text>
-      </View>
+      <Preload />
     );
   }
 

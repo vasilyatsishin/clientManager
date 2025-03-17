@@ -3,13 +3,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "./types";
 import Auth from "../components/screens/Auth";
 import Confirmation from "../components/screens/Confirmation";
-import Documents from "../components/screens/Documents";
+import Documents from "../components/screens/NotSended";
 import MainLayout from "../layout/MainLayout";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Route from "../components/screens/Route";
-import AddContragent from "../components/screens/AddContragent";
+import AddContragent from "../components/screens/Sended";
 import Chat from "../components/screens/Chat";
+import NotSended from "../components/screens/NotSended";
+import Sended from "../components/screens/Sended";
 
 const Stack = createNativeStackNavigator<TypeRootStackParamList>();
 
@@ -31,8 +33,8 @@ const Navigation: FC = () => {
               id={undefined}
               screenOptions={{ headerShown: false, animation: "none"}}
             >
-              <Stack.Screen name="Documents" component={Documents} />
-              <Stack.Screen name="Route" component={Route} />
+              <Stack.Screen name="NotSended" component={NotSended} />
+              <Stack.Screen name="Sended" component={Sended} />
               <Stack.Screen name="AddContragent" component={AddContragent} />
               <Stack.Screen name="Chat" component={Chat} />
             </Stack.Navigator>
