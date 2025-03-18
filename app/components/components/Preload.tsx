@@ -7,7 +7,7 @@ const Preload: FC = () => {
     const logo = require("../../assets/img/logo.png");
     return(
         <View style={styles.wrapper}>
-            <Image source={logo}/>
+            <Image source={logo} style={{width: 221.25, height: 181.7}}/>
         </View>
     )
 }

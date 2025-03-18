@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState: authState = {
   exist: false,
   bosId: null,
-  user: {userId: 23, sector: ["Food", "Non-Food"]},
+  user: null,
   accessToken: ""
 };
 
@@ -18,7 +18,7 @@ const authSlice = createSlice({
     setBosId: (state, action: { payload: number }) => {
       state.bosId = action.payload;
     },
-    setUserInfo: (state, action: { payload: UserInfoResponse }) => {
+    setUserInfo: (state, action: { payload: UserInfoResponse | null }) => {
       state.user = action.payload;
     },
     setAccessToken: (state, action: { payload: string }) => {

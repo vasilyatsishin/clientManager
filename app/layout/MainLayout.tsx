@@ -8,19 +8,18 @@ import {
   Image,
   Animated,
   Dimensions,
-  TouchableWithoutFeedback,
-  Modal,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SecureStore from "expo-secure-store";
 import { changeTheme } from "../redux/slices/generalSlice";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../assets/colors";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "../navigation/types";
-import { red } from "react-native-reanimated/lib/typescript/Colors";
+import UserMenu from "./UserMenu";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -30,6 +29,7 @@ interface MainLayoutProps {
 const screenWidth = Dimensions.get("window").width;
 
 const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
+
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.generalSlice.theme);
   const sectors = useSelector((state: RootState) => state.generalSlice.sectors);
@@ -53,21 +53,11 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
 
   const toggleMenu = () => {
     Animated.timing(menuAnimation, {
-      toValue: isMenuOpen ? screenWidth : screenWidth * 0.3,
+      toValue: isMenuOpen ? screenWidth: screenWidth * 0.2,
       duration: 300,
       useNativeDriver: false,
     }).start();
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    if (isMenuOpen) {
-      Animated.timing(menuAnimation, {
-        toValue: screenWidth,
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => setIsMenuOpen(false));
-    }
   };
 
   const toggleRotation = () => {
@@ -101,6 +91,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
             },
           ]}
         >
+          <Text style={styles.activePageText}>{activePage}</Text>
           <TouchableOpacity onPress={toggleMenu}>
             <Image
               source={require("../assets/img/userIcon.png")}
@@ -167,37 +158,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
         </View>
       </View>
       {isMenuOpen && (
-        <TouchableWithoutFeedback onPress={closeMenu}>
-          <View style={styles.overlay}>
-            <Animated.View
-              style={[styles.menuContainer, { left: menuAnimation }]}
-            >
-              <View style={styles.containerForButtons}>
-                {sectors.length > 1 &&
-                  sectors.map((sector, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => {
-                        dispatch(changeTheme(sector));
-                      }}
-                      style={[
-                        styles.chooseButton,
-
-                        {
-                          backgroundColor:
-                            sector === "Food" ? colors.food : colors.nonfood,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.buttonText}>
-                        {sector === "Food" ? "Food" : "Non-Food"}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-              </View>
-            </Animated.View>
-          </View>
-        </TouchableWithoutFeedback>
+        <UserMenu isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}/>
       )}
     </SafeAreaProvider>
   );
@@ -214,7 +175,8 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     height: 60,
-    borderRadius: 15,
+    borderTopStartRadius: 15,
+    borderTopEndRadius: 15,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -222,7 +184,7 @@ const styles = StyleSheet.create({
   upperNav: {
     height: 50,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   iconUser: {
@@ -246,64 +208,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Затемнення фону
-  },
-  menuContainer: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: "70%",
-    backgroundColor: "#fff",
-    paddingVertical: 15,
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeButton: {
-    padding: 15,
-    alignSelf: "flex-start",
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: "#000",
-  },
-  containerForButtons: {},
-  chooseButton: {
-    width: 200,
-    height: 70,
-    borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 30,
-  },
-  chatMenu: {
-    position: "absolute",
-    bottom: 100,
-    right: 20,
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  chatMenuItem: {
-    padding: 10,
-  },
-  chatMenuText: {
-    fontSize: 16,
-    color: "black",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   buttonAdd: {
     width: 60,
@@ -315,7 +220,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 100,
-    backgroundColor: "red",
+    backgroundColor: colors.food,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -324,6 +229,12 @@ const styles = StyleSheet.create({
     height: 27.75,
   },
   plusIconWrapped: {},
+  activePageText: {
+    marginLeft: 15,
+    color: "white",
+    fontFamily: "Montserrat-Regular",
+    letterSpacing: 0,
+  },
 });
 
 export default MainLayout;

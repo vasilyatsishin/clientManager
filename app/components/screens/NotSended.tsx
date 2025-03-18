@@ -26,7 +26,7 @@ const NotSended: FC = () => {
   );
 
   useEffect(() => {
-    dispatch(changeActivePage("Заявки"));
+    dispatch(changeActivePage("Невідправлені"));
     if (storedDocuments?.length) {
       return;
     }

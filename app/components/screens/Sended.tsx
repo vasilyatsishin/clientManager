@@ -18,17 +18,17 @@ const Sended: FC = () => {
   );
 
   useEffect(() => {
-    dispatch(changeActivePage("Заявки"));
+    dispatch(changeActivePage("Відправлені"));
     if (storedDocuments?.length) {
       return;
     }
 
     const fetchData = async () => {
       try {
-        let documents = await getDocumentsFromServer(business);
         const { accessToken } = await refresh(token);
         dispatch(setAccessToken(accessToken));
-
+        let documents = await getDocumentsFromServer(business);
+        
         dispatch(
           setDocuments({ business, type: "sended", documents })
         );

@@ -2,9 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import { generalState } from "../../interfaces/interfaces";
 
 const initialState: generalState = {
-  theme: "Food",
+  theme: "",
   safeViewColor: "white",
-  sectors: ["Food", "Non-Food"],
+  sectors: null,
   activePage: "",
 };
 

@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { FC, useEffect } from "react";
+import { createNativeStackNavigator, NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TypeRootStackParamList } from "./types";
 import Auth from "../components/screens/Auth";
 import Confirmation from "../components/screens/Confirmation";
@@ -12,10 +12,12 @@ import AddContragent from "../components/screens/Sended";
 import Chat from "../components/screens/Chat";
 import NotSended from "../components/screens/NotSended";
 import Sended from "../components/screens/Sended";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator<TypeRootStackParamList>();
 
 const Navigation: FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>()
   // const { user } = useAuth();
   const activePage = useSelector(
     (state: RootState) => state.generalSlice.activePage
@@ -24,6 +26,7 @@ const Navigation: FC = () => {
   const user = useSelector(
     (state: RootState) => state.authSlice.user
   );
+
   return (
     <>
       {user ? (
