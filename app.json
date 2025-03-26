@@ -4,5 +4,8 @@
   "plugins": [
     "expo-secure-store",
     "expo-font"
-  ]
+  ],
+  "android": {
+    "package": "com.anonymous.rnts"
+  }
 }

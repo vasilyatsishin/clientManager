@@ -15,7 +15,9 @@ import { isTokenExpired, refresh } from "../functions/auth";
 import * as SecureStore from "expo-secure-store";
 import { setAccessToken, setUserInfo } from "../redux/slices/authSlice";
 import Preload from "../components/components/Preload";
+import * as SQLite from "expo-sqlite";
 
+export const db = SQLite.openDatabaseAsync("ClientManagerLocalDB")
 export const InitializeContext = createContext<IContext>({} as IContext);
 
 interface InitializeProviderProps {
@@ -32,7 +34,7 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
   const dispatch = useDispatch();
   const initializeApp = async () => {
     setIsInitializing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setError(null);
     const accessToken = await AsyncStorage.getItem("accessToken");
 
@@ -45,15 +47,15 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
       const userId = await AsyncStorage.getItem("userId");
       const savedSectors = await AsyncStorage.getItem("sectors");
 
-      dispatch(setAccessToken(token));
-      dispatch(changeTheme(savedTheme));
-      dispatch(changeSectors(JSON.parse(savedSectors)));
-      dispatch(
+      await dispatch(
         setUserInfo({
           sector: JSON.parse(savedSectors),
           userId: JSON.parse(userId),
         })
       );
+      dispatch(setAccessToken(token));
+      dispatch(changeTheme(savedTheme));
+      dispatch(changeSectors(JSON.parse(savedSectors)));
     };
 
     const initializingIfTokenValid = async () => {
@@ -62,26 +64,27 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
       const savedSectors = await AsyncStorage.getItem("sectors");
       const token = await AsyncStorage.getItem("accessToken");
 
-      dispatch(setAccessToken(token));
-      dispatch(changeTheme(savedTheme));
-      dispatch(changeSectors(JSON.parse(savedSectors)));
-      dispatch(
+      await dispatch(
         setUserInfo({
           sector: JSON.parse(savedSectors),
           userId: JSON.parse(userId),
         })
       );
+      dispatch(setAccessToken(token));
+      dispatch(changeTheme(savedTheme));
+      dispatch(changeSectors(JSON.parse(savedSectors)));
     }
     if (accessToken != null) {
       try {
         let token = await AsyncStorage.getItem("accessToken");
         const expiredToken = isTokenExpired(accessToken);
-
+        
         if (expiredToken) {
-          refreshingFunc(token);
+          await refreshingFunc(token);
         } else {
-          initializingIfTokenValid()
+          await initializingIfTokenValid()
         }
+        
       } catch (error) {
         console.error("Помилка ініціалізації:", error);
         setError(
@@ -105,7 +108,8 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
       isLoading,
       setUser,
       initializeApp,
-      setIsLoading
+      setIsLoading,
+      isInitializing
     }),
     [user, isLoading]
   );

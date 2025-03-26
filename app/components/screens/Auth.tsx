@@ -22,13 +22,12 @@ const Auth: FC = () => {
   const [bosId, setBosIdLocal] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
-  const {isLoading, setIsLoading} = useAuth()
+  const { isLoading, setIsLoading } = useAuth();
   const dispatch = useDispatch();
   const navigation =
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
 
-  const logo = require("../../assets/img/logoBertaGroupWithoutText.png");
-  const icon = require("../../assets/img/infoIcon.png");
+  const logo = require("../../assets/img/logoBlueText.png");
 
   const handleLogin = async () => {
     if (!bosId.trim()) {
@@ -38,7 +37,7 @@ const Auth: FC = () => {
 
     const bosIdNumber = Number(bosId);
     dispatch(setBosId(bosIdNumber));
-    
+
     if (isNaN(bosIdNumber) || bosIdNumber <= 0) {
       setErrorMessage("Berta-ID має бути додатним числом");
       return;
@@ -47,13 +46,13 @@ const Auth: FC = () => {
     setErrorMessage("");
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await login(bosIdNumber);
-      navigation.navigate("Confirmation")
+      navigation.navigate("Confirmation");
     } catch (error: any) {
       setErrorMessage(error.message);
-    } finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,12 +60,11 @@ const Auth: FC = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.view}>
         <Image source={logo} style={styles.logo} />
-        <Text style={styles.headerText}>Log In</Text>
+        <Text style={styles.headerText}>Обліковий запис</Text>
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
+            <Text style={styles.placeholder}>Ідентифікатор користувача</Text>
             <TextInput
-              placeholder="Введіть Berta-ID"
-              placeholderTextColor="grey"
               value={bosId}
               style={[styles.input]}
               keyboardType="numeric"
@@ -75,23 +73,15 @@ const Auth: FC = () => {
                 setErrorMessage("");
               }}
             />
-            <TouchableOpacity onPress={() => setShowTooltip(!showTooltip)}>
-              <Image source={icon} style={styles.icon} />
-            </TouchableOpacity>
-            {showTooltip && (
-              <View style={styles.tooltip}>
-                <Text style={styles.tooltipText}>
-                  Berta-ID можна знайти у вашому профілі
-                </Text>
-              </View>
-            )}
           </View>
           {errorMessage ? (
             <Text style={styles.errorText}>{errorMessage}</Text>
           ) : null}
         </View>
         <TouchableOpacity style={styles.buttonAuth} onPress={handleLogin}>
-          <Text style={styles.textInButton}>{isLoading ? <Loader /> : "Log In"}</Text>
+          <Text style={styles.textInButton}>
+            {isLoading ? <Loader /> : "Продовжити"}
+          </Text>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
@@ -99,7 +89,7 @@ const Auth: FC = () => {
 };
 
 const styles = StyleSheet.create({
-  logo: { width: 60, height: 45 },
+  logo: { width: 102, height: 80 },
   view: {
     flex: 1,
     alignItems: "center",
@@ -108,51 +98,52 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 22,
-    fontWeight: "bold",
-    color: "#202d3a",
+    fontFamily: "Montserrat-Medium",
+    color: "#223444",
     marginBottom: 10,
-    marginTop: 60,
+    marginTop: 80,
   },
-  inputContainer: { width: 230, marginBottom: 20 },
-  inputWrapper: { height: 60, flexDirection: "row", alignItems: "center" },
+  inputContainer: { width: 315, marginBottom: 55, marginTop: 30 },
+  inputWrapper: {
+    height: 48,
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
   input: {
-    borderColor: "lightgrey",
-    borderBottomWidth: 2,
+    borderColor: "#223444",
+    borderBottomWidth: 1,
     width: "100%",
     height: "100%",
     justifyContent: "center",
     marginBottom: 10,
-    paddingTop: 15,
   },
   buttonAuth: {
-    backgroundColor: "#202d3a",
+    backgroundColor: "#223444",
     width: 230,
-    height: 60,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
     marginBottom: 10,
     borderRadius: 30,
   },
-  textInButton: { color: "lightgrey" },
+  textInButton: {
+    color: "white",
+    fontFamily: "Montserrat-Medium",
+    fontSize: 14,
+  },
   errorText: {
     color: "red",
     fontSize: 14,
-    marginTop: 5,
-    position: "absolute",
-    top: 55,
-  },
-  icon: { width: 22, height: 22, marginTop: 10, marginLeft: 13 },
-  tooltip: {
+    marginTop: 30,
     position: "absolute",
     top: 40,
-    left: 20,
-    backgroundColor: "#333",
-    padding: 10,
-    borderRadius: 5,
-    zIndex: 1000,
   },
-  tooltipText: { color: "#fff", fontSize: 14 },
+  placeholder: {
+    fontFamily: "Montserrat-Medium",
+    fontSize: 12,
+    color: "#223444"
+  }
 });
 
 export default Auth;

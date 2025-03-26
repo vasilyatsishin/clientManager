@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { setAccessToken, setUserInfo } from "../../redux/slices/authSlice";
 import { changeSectors, changeTheme } from "../../redux/slices/generalSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Image } from "react-native";
 
 const Confirmation: FC = () => {
   const [otp, setOtp] = useState<string>("");
@@ -23,6 +24,8 @@ const Confirmation: FC = () => {
   const selector = useSelector((state: RootState) => state.authSlice);
   const dispatch = useDispatch();
   const { setUser } = useAuth();
+
+  const logo = require("../../assets/img/logoBlueText.png");
 
   const choosingSector = async (sector: string[]) => {
     try {
@@ -47,13 +50,13 @@ const Confirmation: FC = () => {
 
       if (response) {
         dispatch(setUserInfo(response));
-        choosingSector(response.sector)
-        const token = await AsyncStorage.getItem("accessToken")
-        dispatch(setAccessToken(token))
+        choosingSector(response.sector);
+        const token = await AsyncStorage.getItem("accessToken");
+        dispatch(setAccessToken(token));
         setUser({
           userId: response.userId,
-          sector: response.sector
-        })
+          sector: response.sector,
+        });
       }
     } catch (error: any) {
       setErrorMessage(error.message);
@@ -90,7 +93,8 @@ const Confirmation: FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Enter the OTP</Text>
+      <Image source={logo} style={styles.logo} />
+      <Text style={styles.header}>Введіть код підтвердження</Text>
       <View style={styles.inputContainer}>
         {[...Array(maxLength)].map((_, index) => (
           <View style={styles.inputWrapper} key={index}>
@@ -119,7 +123,7 @@ const Confirmation: FC = () => {
         onPress={confirm}
         disabled={otp.length !== maxLength}
       >
-        <Text style={styles.buttonText}>Confirm</Text>
+        <Text style={styles.buttonText}>Увійти</Text>
       </TouchableOpacity>
     </View>
   );
@@ -129,7 +133,7 @@ const styles = StyleSheet.create({
   // Стилі без змін
   container: {
     flex: 1,
-    justifyContent: "center",
+    paddingTop: 100,
     alignItems: "center",
     backgroundColor: "white",
   },
@@ -137,9 +141,12 @@ const styles = StyleSheet.create({
     borderColor: "red",
   },
   header: {
+    marginTop: 100,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Montserrat-Medium",
     marginBottom: 20,
+    color: "#223444",
+    
   },
   inputContainer: {
     flexDirection: "row",
@@ -150,26 +157,30 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   input: {
-    width: 50,
+    width: 25,
     height: 50,
     borderBottomWidth: 2,
-    borderColor: "#202d3a",
+    borderColor: "#223444",
+    fontFamily: "Montserrat-Medium",
+    color: "#223444",
     fontSize: 20,
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#202d3a",
-    marginTop: 20,
+    backgroundColor: "#223444",
+    marginTop: 40,
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 30,
     width: 230,
-    height: 60,
+    height: 50,
   },
   buttonText: {
     textAlign: "center",
-    color: "lightgrey",
+    color: "white",
     margin: "auto",
+    fontFamily: "Montserrat-Medium",
+    fontSize: 14,
   },
   buttonDisabled: {
     backgroundColor: "grey",
@@ -177,11 +188,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 14,
-    // marginTop: 5,
     marginLeft: 5,
     position: "absolute",
     top: 55,
   },
+  logo: { width: 102, height: 80 },
 });
 
 export default Confirmation;

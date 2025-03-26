@@ -49,7 +49,7 @@ const UserMenu: FC<UserMenuProps> = ({ isMenuOpen, setIsMenuOpen }) => {
     <View style={styles.overlay} pointerEvents="box-none">
       <Pressable style={styles.overlay} onPress={closeMenu} />
       <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
-        <View style={{ alignItems: "center", top: 220 }}>
+        <View style={{ alignItems: "center", top: 150 }}>
           <Image source={require("../assets/img/userIcon.png")} style={{ width: 70, height: 70 }} />
           <Text style={styles.name}>Name Name</Text>
           <View style={styles.containerForButtons}>
@@ -91,11 +91,10 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     position: "absolute",
-    top: 0,
     bottom: 0,
     width: "80%",
     backgroundColor: "#fff",
-    paddingVertical: 15,
+    paddingVertical: 0,
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
     height: "100%",
@@ -126,8 +125,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 12,
-    fontWeight: "500",
-    fontFamily: "Montserrat-Regular",
+    fontFamily: "Montserrat",
   },
   logoutContainer: {
     position: "absolute",
@@ -136,7 +134,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutText: {
-    fontFamily: "Montserrat-Regular",
+    fontFamily: "Montserrat",
     fontSize: 12,
     color: "#EB1E30",
     marginRight: 3,
@@ -146,8 +144,8 @@ const styles = StyleSheet.create({
     height: 12,
   },
   name: {
-    fontFamily: "Montserrat-Regular",
-    fontSize: 17,
+    fontFamily: "Montserrat",
+    fontSize: 18,
     marginTop: 5,
     marginBottom: 5,
     color: "#223444",
