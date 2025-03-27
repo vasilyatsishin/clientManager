@@ -3,6 +3,6 @@ export type TypeRootStackParamList = {
   Confirmation: undefined;
   NotSended: undefined;
   Sended: undefined
-  AddContragent: undefined;
+  AddClient: undefined;
   Chat: undefined;
 };

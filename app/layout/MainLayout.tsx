@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   StatusBar,
@@ -27,8 +27,6 @@ interface MainLayoutProps {
   activePage: string;
 }
 
-const screenWidth = Dimensions.get("window").width;
-
 const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.generalSlice.theme);
@@ -37,30 +35,40 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const rotationAnim = useRef(new Animated.Value(0)).current;
+  const isMainLayoutShown = useSelector(
+    (state: RootState) => state.generalSlice.isMainLayoutShown
+  );
 
-  useEffect(() => {
-    const loadTheme = async () => {
-      const storedTheme = await AsyncStorage.getItem("theme");
-      if (storedTheme) {
-        dispatch(changeTheme(storedTheme));
-      }
-    };
-    loadTheme();
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const loadTheme = async () => {
+  //     const storedTheme = await AsyncStorage.getItem("theme");
+  //     if (storedTheme) {
+  //       dispatch(changeTheme(storedTheme));
+  //     }
+  //   };
+  //   loadTheme();
+  // }, [dispatch]);
 
-  const toggleRotation = () => {
+  const toggleRotation = useCallback(() => {
     Animated.timing(rotationAnim, {
-      toValue: isActionMenuOpen ? 0 : 1, // 0 — стандартний стан, 1 — повернутий на 45 градусів
+      toValue: isActionMenuOpen ? 0 : 1,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    setIsActionMenuOpen(!isActionMenuOpen);
-  };
+    setIsActionMenuOpen(prev => !prev);
+  }, [isActionMenuOpen, rotationAnim]);
 
-  const rotateInterpolation = rotationAnim.interpolate({
+  const navigationFunc = useCallback((to: string) => {
+    navigation.navigate(to as keyof TypeRootStackParamList);
+    setTimeout(() => {
+      setIsActionMenuOpen(false); 
+    }, 1); 
+  }, [navigation])
+
+  const rotateInterpolation = useMemo(() => rotationAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "45deg"],
-  });
+  }), [rotationAnim]);
 
   return (
     <SafeAreaProvider>
@@ -71,58 +79,63 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
         edges={["top"]}
       >
         <StatusBar barStyle="default" />
-        <View
-          style={[
-            styles.upperNav,
-            {
-              backgroundColor: theme === "Food" ? colors.food : colors.nonfood,
-            },
-          ]}
-        >
-          <Text style={styles.activePageText}>{activePage}</Text>
-          <TouchableOpacity onPress={() => setIsMenuOpen(!isMenuOpen)}>
-            <Image
-              source={require("../assets/img/userIcon.png")}
-              style={styles.iconUser}
-            />
-          </TouchableOpacity>
-        </View>
+        {isMainLayoutShown && (
+          <View
+            style={[
+              styles.upperNav,
+              {
+                backgroundColor:
+                  theme === "Food" ? colors.food : colors.nonfood,
+              },
+            ]}
+          >
+            <Text style={styles.activePageText}>{activePage}</Text>
+            <TouchableOpacity onPress={() => setIsMenuOpen(!isMenuOpen)}>
+              <Image
+                source={require("../assets/img/userIcon.png")}
+                style={styles.iconUser}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </SafeAreaView>
 
       <View style={styles.container}>
         <View style={styles.component}>{children}</View>
-        <View style={[styles.bottomNav]}>
-          <View style={styles.bottomNavContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("NotSended")}
-            >
-              <Image
-                source={require("../assets/img/newIcon.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("Sended")}
-            >
-              <Image
-                source={require("../assets/img/sended.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate("Chat")}
-            >
-              <Image
-                source={require("../assets/img/chatIcon.png")}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
+        {isMainLayoutShown && (
+          <View style={[styles.bottomNav]}>
+            <View style={styles.bottomNavContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate("NotSended")}
+              >
+                <Image
+                  source={require("../assets/img/newIcon.png")}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate("Sended")}
+              >
+                <Image
+                  source={require("../assets/img/sended.png")}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate("Chat")}
+              >
+                <Image
+                  source={require("../assets/img/chatIcon.png")}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {!isMenuOpen && (
+        )}
+        {(!isMenuOpen && isMainLayoutShown) && (
           <TouchableOpacity style={styles.buttonAdd} onPress={toggleRotation}>
             <View style={styles.redContainerButtonAdd}>
               <Animated.Image
@@ -137,7 +150,6 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
         )}
       </View>
 
-      {/* Спливаюче меню дій */}
       <Modal
         transparent
         visible={isActionMenuOpen}
@@ -146,20 +158,23 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
       >
         <BlurView intensity={15} style={styles.overlay}>
           <View style={styles.menu}>
-            <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuText}>
-                ДОДАВАННЯ ТОРГОВОЇ ТОЧКИ В МАРШРУТ
-              </Text>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigationFunc("AddClient"); 
+              }}
+            >
+              <Text style={styles.menuText}>СТВОРЕННЯ КОНТРАГЕНТА</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuText}>
-                СТВОРЕННЯ КОНТРАГЕНТА ТА ДОГОВОРУ
-              </Text>
+              <Text style={styles.menuText}>СТВОРЕННЯ ДОГОВОРУ</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <Text style={styles.menuText}>СТВОРЕННЯ ТОРГОВОЇ ТОЧКИ</Text>
             </TouchableOpacity>
-            <View style={styles.whiteContainer}></View>
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuText}>ДОДАТИ В МАРШРУТ</Text>
+            </TouchableOpacity>
           </View>
         </BlurView>
 
@@ -237,7 +252,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginRight: 20,
     alignItems: "flex-end",
-    width: "95%", // або Dimensions.get("window").width * 0.8 для динамічної ширини
+    width: "95%",
     alignSelf: "flex-end",
     bottom: 100,
   },

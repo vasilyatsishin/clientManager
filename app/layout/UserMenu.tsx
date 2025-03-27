@@ -1,5 +1,14 @@
 import { FC, useEffect, useRef } from "react";
-import { Animated, View, Pressable, StyleSheet, Text, Image, TouchableOpacity, Dimensions } from "react-native";
+import {
+  Animated,
+  View,
+  Pressable,
+  StyleSheet,
+  Text,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { setAccessToken, setUserInfo } from "../redux/slices/authSlice";
@@ -50,30 +59,40 @@ const UserMenu: FC<UserMenuProps> = ({ isMenuOpen, setIsMenuOpen }) => {
       <Pressable style={styles.overlay} onPress={closeMenu} />
       <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
         <View style={{ alignItems: "center", top: 150 }}>
-          <Image source={require("../assets/img/userIcon.png")} style={{ width: 70, height: 70 }} />
+          <Image
+            source={require("../assets/img/userIcon.png")}
+            style={{ width: 70, height: 70 }}
+          />
           <Text style={styles.name}>Name Name</Text>
-          <View style={styles.containerForButtons}>
-            {sectors.length > 1 &&
-              sectors.map((sector, index) => (
+          {sectors.length > 1 && (
+            <View style={styles.containerForButtons}>
+              {sectors.map((sector, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => dispatch(changeTheme(sector))}
                   style={[
                     styles.chooseButton,
                     {
-                      backgroundColor: sector === "Food" ? colors.food : colors.nonfood,
+                      backgroundColor:
+                        sector === "Food" ? colors.food : colors.nonfood,
                       width: sector === "Food" ? 70 : 100,
                     },
                   ]}
                 >
-                  <Text style={styles.buttonText}>{sector === "Food" ? "FOOD" : "NON-FOOD"}</Text>
+                  <Text style={styles.buttonText}>
+                    {sector === "Food" ? "FOOD" : "NON-FOOD"}
+                  </Text>
                 </TouchableOpacity>
               ))}
-          </View>
+            </View>
+          )}
         </View>
         <TouchableOpacity style={styles.logoutContainer} onPress={logout}>
           <Text style={[styles.logoutText]}>Вийти</Text>
-          <Image source={require("../assets/img/logoutIcon.png")} style={styles.logoutIcon} />
+          <Image
+            source={require("../assets/img/logoutIcon.png")}
+            style={styles.logoutIcon}
+          />
         </TouchableOpacity>
       </Animated.View>
     </View>

@@ -6,6 +6,7 @@ const initialState: generalState = {
   safeViewColor: "white",
   sectors: null,
   activePage: "",
+  isMainLayoutShown: true
 };
 
 const generalSlice = createSlice({
@@ -24,6 +25,9 @@ const generalSlice = createSlice({
     changeActivePage: (state, action: { payload: string }) => {
       state.activePage = action.payload;
     },
+    setIsMainLayoutShown: (state, action: { payload: boolean }) => {
+      state.isMainLayoutShown = action.payload;
+    }
   },
 });
 
@@ -32,5 +36,6 @@ export const {
   changeSafeViewColor,
   changeSectors,
   changeActivePage,
+  setIsMainLayoutShown
 } = generalSlice.actions;
 export default generalSlice.reducer;

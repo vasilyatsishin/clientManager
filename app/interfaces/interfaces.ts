@@ -27,6 +27,7 @@ export interface generalState {
   safeViewColor: string;
   sectors: string[];
   activePage: string;
+  isMainLayoutShown: boolean
 }
 
 export interface authState {
