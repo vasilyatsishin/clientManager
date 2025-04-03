@@ -4,7 +4,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState: authState = {
   exist: false,
   bosId: null,
-  user: null,
+  user: {
+    sector: ["Food", "Non-Food"],
+    userId: 2876
+  },
   accessToken: ""
 };
 

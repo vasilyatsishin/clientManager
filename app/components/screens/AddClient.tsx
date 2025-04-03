@@ -57,28 +57,27 @@ const AddClient: FC = () => {
 
           <Text style={styles.upperNavText}>Новий клієнт</Text>
         </View>
-        <TouchableOpacity style={styles.buttonAdd}>
-          <Text
-            style={[
-              styles.buttonAddText,
-              { color: theme == "Food" ? colors.food : colors.nonfood },
-            ]}
-          >
-            Додати
-          </Text>
-        </TouchableOpacity>
       </View>
-      <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: "#ECECECEC"}}
-      >
+      <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#ECECECEC" }}>
         <FlatList
           data={[{ key: "form" }]}
           renderItem={() => (
             <>
-              <ClientForm theme={theme}/>
-              <ClientComponents theme={theme}/>
-              <Documents theme={theme}/>
-              <Comment theme={theme}/>
+              <ClientForm theme={theme} />
+              <ClientComponents theme={theme} />
+              <Documents theme={theme} />
+              <Comment theme={theme} />
+              <View style={styles.wrapperForSendButton}>
+                <TouchableOpacity style={styles.buttonAdd}>
+                  <Text
+                    style={[
+                      styles.buttonAddText,
+                    ]}
+                  >
+                    Додати
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
           keyboardShouldPersistTaps="handled"
@@ -110,16 +109,22 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat",
     letterSpacing: 0,
   },
+  wrapperForSendButton: {
+    width: "100%",
+    alignItems: "center"
+  },
   buttonAdd: {
     marginRight: 20,
-    backgroundColor: "white",
-    width: 100,
+    backgroundColor: colors.nonfood,
+    width: "50%",
     height: 40,
-    borderRadius: 30,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonAddText: {
     fontFamily: "Montserrat-Medium",
+    color: "white",
+    fontSize: 20
   },
 });

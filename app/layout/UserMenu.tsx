@@ -64,7 +64,7 @@ const UserMenu: FC<UserMenuProps> = ({ isMenuOpen, setIsMenuOpen }) => {
             style={{ width: 70, height: 70 }}
           />
           <Text style={styles.name}>Name Name</Text>
-          {sectors.length > 1 && (
+          {sectors?.length > 1 && (
             <View style={styles.containerForButtons}>
               {sectors.map((sector, index) => (
                 <TouchableOpacity
