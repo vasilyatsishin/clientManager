@@ -5,4 +5,5 @@ export type TypeRootStackParamList = {
   Sended: undefined
   AddClient: undefined;
   Chat: undefined;
+  Address: undefined
 };

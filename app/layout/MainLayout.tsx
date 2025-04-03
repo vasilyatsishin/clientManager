@@ -50,12 +50,14 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
   // }, [dispatch]);
 
   const toggleRotation = useCallback(() => {
+    setTimeout(() => {
+      setIsActionMenuOpen(!isActionMenuOpen);
+    }, 1)
     Animated.timing(rotationAnim, {
       toValue: isActionMenuOpen ? 0 : 1,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    setIsActionMenuOpen(prev => !prev);
   }, [isActionMenuOpen, rotationAnim]);
 
   const navigationFunc = useCallback((to: string) => {
@@ -161,7 +163,8 @@ const MainLayout: FC<MainLayoutProps> = ({ children, activePage }) => {
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                navigationFunc("AddClient"); 
+                navigationFunc("AddClient");
+                toggleRotation()
               }}
             >
               <Text style={styles.menuText}>СТВОРЕННЯ КОНТРАГЕНТА</Text>

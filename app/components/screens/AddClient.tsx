@@ -1,15 +1,25 @@
 import { FC, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setIsMainLayoutShown } from "../../redux/slices/generalSlice";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { colors } from "../../assets/colors";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { TypeRootStackParamList } from "../../navigation/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import ClientForm from "../components/ClientForm";
-import { ScrollView } from "react-native";
+import { FlatList } from "react-native";
+import ClientComponents from "../components/ClientComponents";
+import Documents from "../components/Documents";
+import Comment from "../components/Comment";
 
 const AddClient: FC = () => {
   const dispatch = useDispatch();
@@ -23,7 +33,7 @@ const AddClient: FC = () => {
   }, []);
 
   const backFunction = () => {
-    navigation.navigate("NotSended");
+    navigation.goBack();
     dispatch(setIsMainLayoutShown(true));
   };
 
@@ -58,9 +68,22 @@ const AddClient: FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <ScrollView>
-        <ClientForm />
-      </ScrollView>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: "#ECECECEC"}}
+      >
+        <FlatList
+          data={[{ key: "form" }]}
+          renderItem={() => (
+            <>
+              <ClientForm theme={theme}/>
+              <ClientComponents theme={theme}/>
+              <Documents theme={theme}/>
+              <Comment theme={theme}/>
+            </>
+          )}
+          keyboardShouldPersistTaps="handled"
+        />
+      </KeyboardAvoidingView>
     </>
   );
 };
@@ -92,11 +115,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: 100,
     height: 40,
-    borderRadius: 10,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonAddText: {
-    fontFamily: "Montserrat-Bold",
+    fontFamily: "Montserrat-Medium",
   },
 });

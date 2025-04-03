@@ -48,3 +48,15 @@ export interface DocumentsState {
   };
 }
 
+interface address {
+
+}
+
+export interface clientState {
+  identifyCode: number;
+  nameSurname: string;
+  phone: string;
+  typeOfPerson: number;
+  clientAddress: address;
+  comment: string;
+}

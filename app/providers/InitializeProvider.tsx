@@ -39,8 +39,7 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
     const accessToken = await AsyncStorage.getItem("accessToken");
 
     const refreshingFunc = async (token: string) => {
-      const refreshToken = await SecureStore.getItemAsync("refreshToken");
-      const { accessToken } = await refresh(refreshToken);
+      const { accessToken } = await refresh(token);
       await AsyncStorage.setItem("accessToken", accessToken);
       token = await AsyncStorage.getItem("accessToken");
       const savedTheme = await AsyncStorage.getItem("theme");
@@ -77,7 +76,7 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
     if (accessToken != null) {
       try {
         let token = await AsyncStorage.getItem("accessToken");
-        const expiredToken = isTokenExpired(accessToken);
+        const expiredToken = isTokenExpired(token);
         
         if (expiredToken) {
           await refreshingFunc(token);
@@ -86,10 +85,10 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
         }
         
       } catch (error) {
-        console.error("Помилка ініціалізації:", error);
-        setError(
-          "Не вдалося завантажити дані. Перевірте інтернет і повторіть спробу."
-        );
+        if (error.message == "401") {
+          dispatch(setAccessToken(null));
+          dispatch(setUserInfo(null));
+        }
       } finally {
         setIsInitializing(false);
       }

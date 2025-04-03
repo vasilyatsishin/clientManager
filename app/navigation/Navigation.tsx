@@ -14,6 +14,7 @@ import NotSended from "../components/screens/NotSended";
 import Sended from "../components/screens/Sended";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AddClient from "../components/screens/AddClient";
+import Address from "../components/screens/Address";
 
 const Stack = createNativeStackNavigator<TypeRootStackParamList>();
 
@@ -44,6 +45,7 @@ const Navigation: FC = () => {
               <Stack.Screen name="Sended" component={Sended} />
               <Stack.Screen name="AddClient" component={AddClient} options={{gestureEnabled: false}}/>
               <Stack.Screen name="Chat" component={Chat} />
+              <Stack.Screen name="Address" component={Address} />
             </Stack.Navigator>
           </MainLayout>
         </>

@@ -14,7 +14,6 @@ import {
   getDocumentsFromLocalDB,
 } from "../../functions/documents";
 import { changeActivePage } from "../../redux/slices/generalSlice";
-import { refresh } from "../../functions/auth";
 import { setAccessToken, setUserInfo } from "../../redux/slices/authSlice";
 const NotSended: FC = () => {
   const dispatch = useDispatch();
