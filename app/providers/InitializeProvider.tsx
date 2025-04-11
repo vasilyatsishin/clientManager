@@ -113,11 +113,11 @@ export const InitializeProvider: FC<InitializeProviderProps> = ({
     [user, isLoading]
   );
 
-  if (isInitializing) {
-    return (
-      <Preload />
-    );
-  }
+  // if (isInitializing) {
+  //   return (
+  //     <Preload />
+  //   );
+  // }
 
   if (error) {
     return (

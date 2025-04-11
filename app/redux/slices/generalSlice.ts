@@ -4,7 +4,7 @@ import { generalState } from "../../interfaces/interfaces";
 const initialState: generalState = {
   theme: "",
   safeViewColor: "white",
-  sectors: null,
+  sectors: ["Food", "Non-Food"],
   activePage: "",
   isMainLayoutShown: true
 };
