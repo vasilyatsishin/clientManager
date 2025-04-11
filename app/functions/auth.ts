@@ -115,6 +115,7 @@ export const refresh = async (accessToken: string) : Promise<RefreshTokenRespons
     }
     
     const data = await response.json();
+
     await AsyncStorage.setItem("accessToken", data.access)
     
     return {

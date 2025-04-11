@@ -11,12 +11,14 @@ const initialState: clientState = {
 };
 
 const clientSlice = createSlice({
-  name: "Slice",
+  name: "client",
   initialState,
   reducers: {
-    
+    setIdentifyCode: (state, action: { payload: string }) => {
+      state.identifyCode = action.payload;
+    }, 
   },
 });
 
-export const { } = clientSlice.actions;
+export const { setIdentifyCode } = clientSlice.actions;
 export default clientSlice.reducer;

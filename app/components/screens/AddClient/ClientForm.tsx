@@ -9,6 +9,14 @@ import {
 import { colors } from "../../../assets/colors";
 import ModalList from "../../generalComponents/ModalList";
 import { MaskedTextInput } from "react-native-mask-text";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+import {
+  getDictionaryByIdentifyCode,
+  getDictionaryByNameSurname,
+} from "../../../functions/addContragent";
+import { DictionaryClientInterface } from "../../../interfaces/interfaces";
 
 const ClientForm: FC = () => {
   const [activeButtonTypeOfPerson, setActiveButtonTypeOfPerson] =
@@ -20,42 +28,50 @@ const ClientForm: FC = () => {
     useState<boolean>(false);
   const [visibleModalForName, setVisibleModalForName] =
     useState<boolean>(false);
+  const theme = useSelector((state: RootState) => state.generalSlice.theme);
 
-  const data = [
-    "123456",
-    "123457",
-    "654321",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987655",
-    "987655",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-    "987654",
-  ];
+  const [codeData, setCodeData] = useState<DictionaryClientInterface[]>();
+  const [nameData, setNameData] = useState<DictionaryClientInterface[]>();
 
-  const filteredDataName = data.filter((item) => item.startsWith(nameSurname));
-  const filteredData = data.filter((item) => item.startsWith(identifyCode));
+  const getEntDictionary = async (text) => {
+    setIdentifyCode(text);
+    if (text.length >= 3) {
+      setVisibleModalForCode(true);
+      const token = await AsyncStorage.getItem("accessToken");
+      const data = await getDictionaryByIdentifyCode(
+        token,
+        theme,
+        text,
+        activeButtonTypeOfPerson
+      );
+      setCodeData(data);
+    } else {
+      setVisibleModalForCode(false);
+    }
+  };
+
+  const getNameDictionary = async (text) => {
+    setNameSurname(text);
+    if (text.length >= 3) {
+      setVisibleModalForName(true);
+      const token = await AsyncStorage.getItem("accessToken");
+      const data = await getDictionaryByNameSurname(
+        token,
+        theme,
+        text,
+        activeButtonTypeOfPerson
+      );
+      setNameData(data);
+    } else {
+      setVisibleModalForName(false);
+    }
+  };
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.wrapper}>
         <View style={styles.upperWrapper}>
-          {activeButtonTypeOfPerson === 0 ? (
+          {activeButtonTypeOfPerson === 1 ? (
             <>
               <View style={styles.inputWrapper}>
                 <Text style={[styles.label]}>
@@ -64,13 +80,8 @@ const ClientForm: FC = () => {
                 <TextInput
                   style={[styles.input]}
                   value={identifyCode}
-                  onChangeText={(text) => {
-                    setIdentifyCode(text);
-                    if (text.length >= 3) {
-                      setVisibleModalForCode(true);
-                    } else {
-                      setVisibleModalForCode(false);
-                    }
+                  onChangeText={async (text) => {
+                    getEntDictionary(text);
                   }}
                   keyboardType="numeric"
                   contextMenuHidden={true}
@@ -78,10 +89,10 @@ const ClientForm: FC = () => {
                 <ModalList
                   key={identifyCode + Math.random()} // 🔹 Форсуємо ререндер при зміні
                   top={53}
-                  data={filteredData} // 🔹 Передаємо лише відфільтровані дані
+                  data={codeData}
                   visible={visibleModalForCode}
                   onSelect={(selectedItem) => {
-                    setIdentifyCode(selectedItem);
+                    setIdentifyCode(selectedItem?.entCode);
                     setVisibleModalForCode(false);
                   }}
                   onClose={() => setVisibleModalForCode(false)}
@@ -92,23 +103,18 @@ const ClientForm: FC = () => {
                 <TextInput
                   style={[styles.input]}
                   value={nameSurname}
-                  onChangeText={(text) => {
-                    setNameSurname(text);
-                    if (text.length >= 3) {
-                      setVisibleModalForName(true);
-                    } else {
-                      setVisibleModalForName(false);
-                    }
+                  onChangeText={async (text) => {
+                    getNameDictionary(text);
                   }}
                   contextMenuHidden={true}
                 />
                 <ModalList
                   key={nameSurname + Math.random()} // 🔹 Форсуємо ререндер при зміні
                   top={54}
-                  data={filteredDataName} // 🔹 Передаємо лише відфільтровані дані
+                  data={nameData} // 🔹 Передаємо лише відфільтровані дані
                   visible={visibleModalForName}
                   onSelect={(selectedItem) => {
-                    setNameSurname(selectedItem);
+                    setNameSurname(selectedItem?.name);
                     setVisibleModalForName(false);
                   }}
                   onClose={() => setVisibleModalForName(false)}
@@ -122,9 +128,8 @@ const ClientForm: FC = () => {
                 <TextInput
                   style={[styles.input]}
                   value={identifyCode}
-                  onChangeText={(text) => {
-                    setIdentifyCode(text);
-                    setVisibleModalForCode(text.length >= 3);
+                  onChangeText={async (text) => {
+                    getEntDictionary(text);
                   }}
                   keyboardType="numeric"
                   contextMenuHidden={true}
@@ -132,42 +137,37 @@ const ClientForm: FC = () => {
                 <ModalList
                   key={identifyCode + Math.random()} // 🔹 Форсуємо ререндер при зміні
                   top={53}
-                  data={filteredData} // 🔹 Передаємо лише відфільтровані дані
+                  data={codeData} // 🔹 Передаємо лише відфільтровані дані
                   visible={visibleModalForCode}
                   onSelect={(selectedItem) => {
-                    setIdentifyCode(selectedItem);
+                    setIdentifyCode(selectedItem?.entCode);
                     setVisibleModalForCode(false);
                   }}
                   onClose={() => setVisibleModalForCode(false)}
                 />
               </View>
-             <View style={styles.inputWrapper}>
-             <Text style={[styles.label]}>Назва організації</Text>
-              <TextInput
-                style={[styles.input]}
-                value={nameSurname}
-                onChangeText={(text) => {
-                  setNameSurname(text);
-                  if (text.length >= 3) {
-                    setVisibleModalForName(true);
-                  } else {
+              <View style={styles.inputWrapper}>
+                <Text style={[styles.label]}>Назва організації</Text>
+                <TextInput
+                  style={[styles.input]}
+                  value={nameSurname}
+                  onChangeText={async (text) => {
+                    getNameDictionary(text);
+                  }}
+                  contextMenuHidden={true}
+                />
+                <ModalList
+                  key={nameSurname + Math.random()} // 🔹 Форсуємо ререндер при зміні
+                  top={54}
+                  data={nameData} // 🔹 Передаємо лише відфільтровані дані
+                  visible={visibleModalForName}
+                  onSelect={(selectedItem) => {
+                    setNameSurname(selectedItem?.name);
                     setVisibleModalForName(false);
-                  }
-                }}
-                contextMenuHidden={true}
-              />
-              <ModalList
-                key={nameSurname + Math.random()} // 🔹 Форсуємо ререндер при зміні
-                top={54}
-                data={filteredDataName} // 🔹 Передаємо лише відфільтровані дані
-                visible={visibleModalForName}
-                onSelect={(selectedItem) => {
-                  setNameSurname(selectedItem);
-                  setVisibleModalForName(false);
-                }}
-                onClose={() => setVisibleModalForName(false)}
-              />
-             </View>
+                  }}
+                  onClose={() => setVisibleModalForName(false)}
+                />
+              </View>
             </>
           )}
         </View>
@@ -185,13 +185,7 @@ const ClientForm: FC = () => {
                 setVisibleModalForCode(false);
               }}
             >
-              <Text
-                style={[
-                  styles.choosePersonButtonText,
-                ]}
-              >
-                Юридична особа
-              </Text>
+              <Text style={[styles.choosePersonButtonText]}>Фізична особа</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -205,16 +199,12 @@ const ClientForm: FC = () => {
                 setVisibleModalForCode(false);
               }}
             >
-              <Text
-                style={[
-                  styles.choosePersonButtonText,
-                ]}
-              >
-                Фізична особа
+              <Text style={[styles.choosePersonButtonText]}>
+                Юридична особа
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={[styles.inputWrapper, {marginTop: 15}]}>
+          <View style={[styles.inputWrapper]}>
             <MaskedTextInput
               placeholder="+38 (___) ___-__-__"
               placeholderTextColor="grey"
@@ -225,7 +215,7 @@ const ClientForm: FC = () => {
                 setPhone(text);
               }}
               value={phone}
-              style={[styles.input, {paddingBottom: 5}]}
+              style={[styles.input, { paddingBottom: 5 }]}
             />
           </View>
         </View>
@@ -250,7 +240,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Montserrat-Medium",
     fontSize: 14,
-    marginVertical: 5,
+    marginTop: 5,
     color: colors.nonfood,
   },
   wrapperChoosingTypeOfPerson: {
@@ -273,27 +263,30 @@ const styles = StyleSheet.create({
   choosePersonButtonText: {
     fontFamily: "Montserrat-Medium",
     fontSize: 14,
-    color: colors.nonfood
+    color: colors.nonfood,
   },
   input: {
     width: "100%",
-    height: 25,
+    height: 40,
     borderBottomWidth: 1,
     borderBottomColor: colors.nonfood,
     fontFamily: "Montserrat",
-    fontSize: 20,
+    fontSize: 15,
     opacity: 1,
+    marginBottom: 5,
+    color: colors.nonfood,
   },
   upperWrapper: {
     width: "100%",
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 10,
-    height: 115,
+    height: 130,
     marginBottom: 5,
   },
   inputWrapper: {
     alignItems: "flex-start",
     width: "92%",
+    height: 60,
   },
 });

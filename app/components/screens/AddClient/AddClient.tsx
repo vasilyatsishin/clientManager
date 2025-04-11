@@ -22,17 +22,15 @@ import ClientComponents from "./ClientComponents";
 import Documents from "./Documents";
 import Comment from "./Comment";
 import { ScrollView } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AddClient: FC = () => {
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.generalSlice.theme);
+  const backIcon = require("../../../assets/img/backIcon.png");
 
   const navigation =
     useNavigation<NativeStackNavigationProp<TypeRootStackParamList>>();
-
-  useEffect(() => {
-    dispatch(setIsMainLayoutShown(false));
-  }, []);
 
   const backFunction = () => {
     navigation.goBack();
@@ -51,41 +49,28 @@ const AddClient: FC = () => {
       >
         <View style={styles.upperNavContainer}>
           <TouchableOpacity onPress={backFunction}>
-            <Image
-              source={require("../../assets/img/backIcon.png")}
-              style={styles.backIcon}
-            ></Image>
+            <Image source={backIcon} style={styles.backIcon}></Image>
           </TouchableOpacity>
 
           <Text style={styles.upperNavText}>Новий клієнт</Text>
         </View>
       </View>
-      <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#ECECECEC" }}>
-        <FlatList
-          data={[{ key: "form" }]}
-          renderItem={() => (
-            <>
-              <ClientForm />
-              <ClientComponents />
-              <Documents />
-              <Comment />
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={styles.flexContainer}
-              >
-                <ScrollView contentContainerStyle={styles.scrollContainer}>
-                  <View style={styles.wrapperForSendButton}>
-                    <TouchableOpacity style={styles.buttonAdd}>
-                      <Text style={[styles.buttonAddText]}>Додати</Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-              </KeyboardAvoidingView>
-            </>
-          )}
-          keyboardShouldPersistTaps="handled"
-        />
-      </KeyboardAvoidingView>
+
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        enableOnAndroid={true}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ClientForm />
+        <ClientComponents />
+        <Documents />
+        <Comment />
+        <View style={styles.wrapperForSendButton}>
+          <TouchableOpacity style={styles.buttonAdd}>
+            <Text style={styles.buttonAddText}>Додати</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
     </>
   );
 };

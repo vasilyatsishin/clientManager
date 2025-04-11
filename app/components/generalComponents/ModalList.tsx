@@ -1,25 +1,26 @@
 import { FC } from "react";
-import { Dimensions } from "react-native";
 import {
   StyleSheet,
   View,
-  FlatList,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   ScrollView,
   Keyboard,
+  Dimensions,
 } from "react-native";
+import { colors } from "../../assets/colors";
+import { DictionaryClientInterface } from "../../interfaces/interfaces";
 
 interface ModalListProps {
   top: number;
-  data: string[];
+  data: DictionaryClientInterface[];
   visible: boolean;
-  onSelect: (item: string) => void;
+  onSelect: (item: DictionaryClientInterface) => void;
   onClose: () => void;
 }
 
-const ModalList: FC<ModalListProps> = ({ top, data, visible, onSelect, onClose}) => {
+const ModalList: FC<ModalListProps> = ({ top, data, visible, onSelect, onClose }) => {
   if (!visible) return null;
 
   return (
@@ -27,24 +28,22 @@ const ModalList: FC<ModalListProps> = ({ top, data, visible, onSelect, onClose})
       <View style={styles.overlay}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={[styles.dropdown, { top }]}>
-            <ScrollView nestedScrollEnabled style={styles.scrollContainer}>
-              <FlatList
-                keyboardShouldPersistTaps="handled"
-                nestedScrollEnabled
-                data={data}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.item}
-                    onPress={() => {
-                      onSelect(item);
-                      onClose();
-                    }}
-                  >
-                    <Text>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              style={styles.scrollContainer}
+            >
+              {data?.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.item}
+                  onPress={() => {
+                    onSelect(item);
+                    onClose();
+                  }}
+                >
+                  <Text style={{color: colors.nonfood}}>{item?.name}</Text>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </TouchableWithoutFeedback>
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "white",
     borderRadius: 5,
-    maxHeight: 200, // Ось це дозволяє скролінг
+    maxHeight: 200,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   scrollContainer: {
-    maxHeight: 200, // Повторно задаємо обмеження висоти
+    maxHeight: 200,
   },
   item: {
     padding: 10,

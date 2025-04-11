@@ -53,10 +53,15 @@ interface address {
 }
 
 export interface clientState {
-  identifyCode: number;
+  identifyCode: string;
   nameSurname: string;
   phone: string;
   typeOfPerson: number;
   clientAddress: address;
   comment: string;
+}
+
+export interface DictionaryClientInterface{
+  name: string;
+  entCode: string
 }

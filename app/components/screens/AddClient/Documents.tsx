@@ -1,25 +1,64 @@
-import { FC } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { FC, useEffect, useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SvgXml } from "react-native-svg";
 import { colors } from "../../../assets/colors";
+import { Camera } from "expo-camera";
+import { Modal } from "react-native";
+import { Touchable } from "react-native";
 
 const Documents: FC = () => {
-  const documentIcon = `<svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Vector">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 4.14286C13.9506 4.14286 13.4238 4.36107 13.0353 4.74954C13.0353 4.74955 13.0353 4.74952 13.0353 4.74954M13.0353 4.74954C12.6468 5.13803 12.4286 5.66493 12.4286 6.21429V20.7143C12.4286 21.8583 11.5012 22.7857 10.3571 22.7857C9.21312 22.7857 8.28571 21.8583 8.28571 20.7143V6.21429C8.28571 4.56612 8.94046 2.98553 10.1058 1.82015C11.2712 0.654767 12.8518 0 14.5 0H41.4286C41.9779 0 42.5048 0.218239 42.8933 0.606707L57.3933 15.1067C57.7818 15.4952 58 16.0221 58 16.5714V51.7857C58 53.4339 57.345 55.0147 56.1799 56.1799C55.0147 57.345 53.4339 58 51.7857 58H31.0714C29.9274 58 29 57.0726 29 55.9286C29 54.7846 29.9274 53.8571 31.0714 53.8571H51.7857C52.3349 53.8571 52.862 53.6388 53.2504 53.2504C53.6388 52.862 53.8571 52.3349 53.8571 51.7857V17.4294L40.5706 4.14286H14.5" fill=${colors.nonfood}/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M14.5 29C15.644 29 16.5714 29.9274 16.5714 31.0714V41.4286H26.9286C28.0726 41.4286 29 42.356 29 43.5C29 44.644 28.0726 45.5714 26.9286 45.5714H16.5714V55.9286C16.5714 57.0726 15.644 58 14.5 58C13.356 58 12.4286 57.0726 12.4286 55.9286V45.5714H2.07143C0.92741 45.5714 0 44.644 0 43.5C0 42.356 0.92741 41.4286 2.07143 41.4286H12.4286V31.0714C12.4286 29.9274 13.356 29 14.5 29Z" fill="${colors.nonfood }"/>
-</g>
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const documentIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.941 4.51319C14.1621 4.27481 14.1542 3.90498 13.9243 3.67544C13.6943 3.4459 13.3238 3.43903 13.086 3.65877L4.08129 12.6494C3.21747 13.5617 3.23712 14.9949 4.12748 15.8827C5.01686 16.7705 6.45261 16.7901 7.36655 15.9279L16.4362 6.87339C17.4494 5.85318 17.8415 4.37094 17.4671 2.98391C17.0927 1.59682 16.0067 0.512846 14.6172 0.139116C13.2267 -0.234639 11.7427 0.156774 10.7198 1.16817L1.60684 10.2648C0.199565 11.7274 -0.332069 13.8208 0.206459 15.7748C0.745968 17.7289 2.27511 19.2562 4.23372 19.7939C6.1913 20.3315 8.2884 19.8008 9.75284 18.396L19.8386 8.32826C20.0597 8.08988 20.0528 7.72005 19.8229 7.49052C19.5929 7.26097 19.2224 7.2541 18.9836 7.47482L8.89788 17.5416C7.74515 18.6726 6.07744 19.1082 4.5179 18.6864C2.95832 18.2646 1.73973 17.0482 1.31607 15.4913C0.893493 13.9345 1.32983 12.2698 2.46291 11.1191L11.5758 2.02246C12.6824 0.917893 14.4748 0.917893 15.5815 2.02148C16.687 3.12604 16.687 4.91524 15.5815 6.01996L6.5108 15.0734C6.07545 15.507 5.37085 15.507 4.93648 15.0734C4.50112 14.6398 4.50112 13.9355 4.93648 13.5019L13.941 4.51319Z" fill=${
+    !isModalOpen ? colors.nonfood : "white"
+  }/>
 </svg>
 `;
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const { status } = await Camera.requestCameraPermissionsAsync();
+  //     setHasPermission(status === "granted");
+  //   })();
+  // }, []);
   return (
     <View style={styles.mainContainer}>
       <View style={styles.wrapper}>
-        <View style={styles.documentsContainer}>
-          <Text style={styles.label}>Документи</Text>
-          <View style={styles.documents}>
-            <SvgXml xml={documentIcon} />
+        <View style={styles.wrapperForButtons}>
+          <View style={styles.labelWrapper}>
+            <Text style={styles.label}>Документи</Text>
           </View>
+          <TouchableOpacity
+            style={[
+              styles.buttonAdd,
+              { backgroundColor: isModalOpen ? colors.nonfood : "white" },
+            ]}
+            onPress={() => setIsModalOpen((prev) => !prev)}
+          >
+            <SvgXml xml={documentIcon} />
+          </TouchableOpacity>
         </View>
+
+        {isModalOpen && (
+          <View style={styles.dropdown}>
+            <TouchableOpacity style={styles.item}>
+              <Text style={styles.textInButtonInList}>Вкласти файл</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.item}>
+              <Text style={styles.textInButtonInList}>Зробити фото</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.item}>
+              <Text style={styles.textInButtonInList}>Вибрати фото</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -34,26 +73,66 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     width: "95%",
-    backgroundColor: "white",
     borderRadius: 10,
-    height: 110,
-    alignItems: "center",
   },
   label: {
     fontFamily: "Montserrat",
-    marginBottom: 10,
-    color: colors.nonfood
+    color: colors.nonfood,
   },
-  documentsContainer: {
-    width: "92%",
+  wrapperForButtons: {
+    width: "50%",
     marginVertical: 7,
+    flexDirection: "row",
   },
   documents: {
     height: 50,
-    // backgroundColor: "red",
+  },
+  labelWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "50%",
+    height: 40,
+    backgroundColor: "white",
+    borderRadius: 20,
+    marginRight: 10,
   },
   icon: {
     width: 100,
     height: 100,
+  },
+  buttonAdd: {
+    width: 35,
+    height: 35,
+    borderRadius: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overlayWithoutClose: {
+    flex: 1,
+    backgroundColor: "transparent", // або rgba(0,0,0,0.1) для затемнення
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  dropdown: {
+    position: "absolute",
+    top: 50, // або розраховуй динамічно
+    left: "27.5%",
+    width: 200,
+    backgroundColor: "white",
+    borderRadius: 10,
+    elevation: 5, // для тіні на Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    zIndex: 100, // важливо!
+  },
+  scrollContainer: {
+    maxHeight: 200,
+  },
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
 });
