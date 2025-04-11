@@ -1,0 +1,11 @@
+{
+  "name": "rn-ts",
+  "slug": "rn-ts",
+  "plugins": [
+    "expo-secure-store",
+    "expo-font"
+  ],
+  "android": {
+    "package": "com.anonymous.rnts"
+  }
+}
